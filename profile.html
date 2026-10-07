@@ -170,6 +170,10 @@
             color: #ef4444;
         }
 
+        #profileLoadStatus {
+            color: #ef4444;
+        }
+
         .stats {
             display: flex;
             justify-content: space-around;
@@ -292,7 +296,8 @@
             <h2 id="user-name">Студент</h2>
             <p id="user-email">student@example.com</p>
             <p id="user-type"></p>
-            <form class="profile-type-form" id="profileTypeForm">
+            <p id="profileLoadStatus" role="status" aria-live="polite" hidden></p>
+            <form class="profile-type-form" id="profileTypeForm" hidden>
                 <label for="profileUserType">Тип акаунта</label>
                 <select id="profileUserType" required>
                     <option value="student">Студент</option>
@@ -378,10 +383,14 @@
                 if (profile.is_admin) {
                     document.getElementById('admin-link').style.display = 'block';
                 }
+                document.getElementById('profileTypeForm').hidden = false;
             } catch (error) {
                 console.error('Не вдалося завантажити профіль:', error);
-                alert(error.message || 'Не вдалося завантажити профіль.');
-                window.location.href = 'login.html';
+                const status = document.getElementById('profileLoadStatus');
+                status.hidden = false;
+                status.textContent = error.code === '42703'
+                    ? 'Потрібно оновити базу даних: виконайте актуальний файл supabase/schema.sql у Supabase SQL Editor.'
+                    : error.message || 'Не вдалося завантажити профіль.';
                 return;
             }
 
