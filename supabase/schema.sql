@@ -85,3 +85,107 @@ drop trigger if exists on_lingoup_auth_user_created on auth.users;
 create trigger on_lingoup_auth_user_created
     after insert on auth.users
     for each row execute function public.create_lingoup_profile();
+
+create table if not exists public.reviews (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references auth.users (id) on delete cascade,
+    author_name text not null,
+    user_type text not null check (user_type in ('student', 'teacher')),
+    content text not null check (char_length(trim(content)) between 5 and 1000),
+    created_at timestamptz not null default now()
+);
+
+alter table public.reviews enable row level security;
+revoke all on table public.reviews from anon, authenticated;
+grant select (id, author_name, user_type, content, created_at)
+    on table public.reviews to anon, authenticated;
+grant insert (user_id, content) on table public.reviews to authenticated;
+grant update (content) on table public.reviews to authenticated;
+grant delete on table public.reviews to authenticated;
+
+drop policy if exists "Anyone can read published reviews" on public.reviews;
+create policy "Anyone can read published reviews"
+    on public.reviews
+    for select
+    to anon, authenticated
+    using (true);
+
+drop policy if exists "Users can publish their own reviews" on public.reviews;
+create policy "Users can publish their own reviews"
+    on public.reviews
+    for insert
+    to authenticated
+    with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can edit their own reviews" on public.reviews;
+create policy "Users can edit their own reviews"
+    on public.reviews
+    for update
+    to authenticated
+    using ((select auth.uid()) = user_id)
+    with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can delete their own reviews" on public.reviews;
+create policy "Users can delete their own reviews"
+    on public.reviews
+    for delete
+    to authenticated
+    using ((select auth.uid()) = user_id);
+
+create or replace function public.set_lingoup_review_author()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+    profile_name text;
+    profile_surname text;
+    profile_type text;
+begin
+    select name, surname, user_type
+    into profile_name, profile_surname, profile_type
+    from public.profiles
+    where id = new.user_id;
+
+    if not found then
+        raise exception 'A profile is required to publish a review';
+    end if;
+
+    new.author_name := concat_ws(' ', nullif(trim(profile_name), ''), nullif(left(trim(profile_surname), 1), '') || '.');
+    new.user_type := profile_type;
+    return new;
+end;
+$$;
+
+revoke all on function public.set_lingoup_review_author() from public;
+drop trigger if exists set_lingoup_review_author on public.reviews;
+create trigger set_lingoup_review_author
+    before insert or update on public.reviews
+    for each row execute function public.set_lingoup_review_author();
+
+create table if not exists public.admin_contacts (
+    id uuid primary key default gen_random_uuid(),
+    label text not null check (char_length(trim(label)) between 1 and 80),
+    value text not null check (char_length(trim(value)) between 1 and 500),
+    created_at timestamptz not null default now()
+);
+
+alter table public.admin_contacts enable row level security;
+revoke all on table public.admin_contacts from anon, authenticated;
+grant select on table public.admin_contacts to anon, authenticated;
+grant insert (label, value) on table public.admin_contacts to authenticated;
+
+drop policy if exists "Anyone can read administrator contacts" on public.admin_contacts;
+create policy "Anyone can read administrator contacts"
+    on public.admin_contacts
+    for select
+    to anon, authenticated
+    using (true);
+
+drop policy if exists "Only administrators can add contacts" on public.admin_contacts;
+create policy "Only administrators can add contacts"
+    on public.admin_contacts
+    for insert
+    to authenticated
+    with check ((select public.is_lingoup_admin()));

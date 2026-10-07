@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Відгуки - LingoUp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-green: #10b981;
+            --text-dark: #334155;
+            --white: #ffffff;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .logo {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--primary-green);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dark);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-green);
+        }
+
+        .page {
+            width: min(100% - 2rem, 900px);
+            margin: 3rem auto;
+        }
+
+        h1,
+        h2 {
+            color: var(--primary-blue);
+        }
+
+        .intro,
+        .review-form,
+        .review-card {
+            padding: 1.5rem;
+            border-radius: 18px;
+            background: var(--white);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .intro {
+            margin-bottom: 1.5rem;
+        }
+
+        .intro p,
+        .privacy-note {
+            color: #64748b;
+        }
+
+        .review-form {
+            margin-bottom: 2rem;
+        }
+
+        .review-form label {
+            display: block;
+            margin: 1rem 0 0.4rem;
+            font-weight: 700;
+        }
+
+        .review-form textarea {
+            width: 100%;
+            min-height: 130px;
+            padding: 0.85rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .review-form textarea:focus {
+            outline: 2px solid var(--primary-green);
+            border-color: transparent;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.7rem 1.3rem;
+            border: 0;
+            border-radius: 50px;
+            background: var(--primary-green);
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+        .privacy-note {
+            margin: 0.6rem 0 0;
+            font-size: 0.9rem;
+        }
+
+        .auth-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        #reviewStatus {
+            min-height: 1.5rem;
+            margin: 0.5rem 0 0;
+        }
+
+        #reviewStatus.error {
+            color: var(--danger);
+        }
+
+        #authStatus.error {
+            color: var(--danger);
+        }
+
+        #reviewsList {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .review-card header {
+            position: static;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .review-author {
+            margin: 0;
+            color: var(--primary-blue);
+            font-size: 1.1rem;
+        }
+
+        .review-meta,
+        .review-date {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .review-content {
+            margin: 0.75rem 0 0;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 650px) {
+            .navbar {
+                flex-wrap: wrap;
+                padding: 0.75rem 1rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                order: 3;
+                justify-content: center;
+                gap: 0.5rem 1rem;
+            }
+
+            .page {
+                margin: 2rem auto;
+            }
+
+            .intro,
+            .review-form,
+            .review-card {
+                padding: 1.1rem;
+            }
+
+            .review-card header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 0.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Lingo<span>Up</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="index.html#contact">Контакти</a></li>
+                <li><a href="reviews.html" aria-current="page">Відгуки</a></li>
+            </ul>
+            <a class="button" id="accountLink" href="login.html">Увійти</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="intro">
+            <h1>Відгуки користувачів</h1>
+            <p>Читайте враження студентів і вчителів та поділіться своїм досвідом навчання в LingoUp.</p>
+        </section>
+
+        <section class="review-form" id="reviewFormSection" hidden>
+            <h2>Залишити відгук</h2>
+            <form id="reviewForm">
+                <label for="reviewContent">Ваш відгук</label>
+                <textarea id="reviewContent" minlength="5" maxlength="1000" required
+                    placeholder="Розкажіть про свій досвід користування LingoUp"></textarea>
+                <button class="button" id="submitReview" type="submit">Опублікувати відгук</button>
+                <p class="privacy-note">Відгук буде видимий усім відвідувачам. Ваше ім’я показуватиметься з першою літерою прізвища.</p>
+            </form>
+            <p id="reviewStatus" role="status" aria-live="polite"></p>
+        </section>
+
+        <section id="signInPrompt" class="review-form" hidden>
+            <h2>Поділіться враженням</h2>
+            <p>Увійдіть або створіть акаунт, щоб опублікувати відгук. Читати відгуки може кожен.</p>
+            <p id="authStatus" role="status" aria-live="polite"></p>
+            <div class="auth-links">
+                <a class="button" href="login.html">Увійти</a>
+                <a class="button" href="register.html">Зареєструватися</a>
+            </div>
+        </section>
+
+        <section aria-labelledby="reviewsHeading">
+            <h2 id="reviewsHeading">Що кажуть користувачі</h2>
+            <p id="reviewsStatus" role="status" aria-live="polite">Завантаження відгуків...</p>
+            <div id="reviewsList"></div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        function renderReviews(reviews) {
+            const reviewsList = document.getElementById('reviewsList');
+            reviewsList.replaceChildren();
+
+            reviews.forEach((review) => {
+                const card = document.createElement('article');
+                card.className = 'review-card';
+
+                const header = document.createElement('header');
+                const author = document.createElement('h3');
+                author.className = 'review-author';
+                author.textContent = review.author_name;
+
+                const meta = document.createElement('span');
+                meta.className = 'review-meta';
+                meta.textContent = review.user_type === 'teacher' ? 'Учитель' : 'Студент';
+
+                const date = document.createElement('time');
+                date.className = 'review-date';
+                date.dateTime = review.created_at;
+                date.textContent = new Date(review.created_at).toLocaleDateString('uk-UA');
+
+                const content = document.createElement('p');
+                content.className = 'review-content';
+                content.textContent = review.content;
+
+                header.append(author, meta, date);
+                card.append(header, content);
+                reviewsList.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const reviewsStatus = document.getElementById('reviewsStatus');
+            const reviewFormSection = document.getElementById('reviewFormSection');
+            const signInPrompt = document.getElementById('signInPrompt');
+            const authStatus = document.getElementById('authStatus');
+            const accountLink = document.getElementById('accountLink');
+
+            async function loadReviews() {
+                const reviews = await LingoUp.getReviews();
+                renderReviews(reviews);
+                reviewsStatus.classList.remove('error');
+                reviewsStatus.textContent = reviews.length
+                    ? `Усього відгуків: ${reviews.length}`
+                    : 'Поки що відгуків немає. Будьте першим!';
+            }
+
+            try {
+                const user = await LingoUp.getCurrentUser();
+                if (user) {
+                    reviewFormSection.hidden = false;
+                    accountLink.href = 'profile.html';
+                    accountLink.textContent = 'Кабінет';
+                } else {
+                    signInPrompt.hidden = false;
+                }
+            } catch (error) {
+                signInPrompt.hidden = false;
+                authStatus.textContent = error.message || 'Не вдалося перевірити вхід.';
+                authStatus.classList.add('error');
+                console.error('Не вдалося перевірити вхід:', error);
+            }
+
+            try {
+                await loadReviews();
+            } catch (error) {
+                reviewsStatus.textContent = ['PGRST205', '42P01', '42703'].includes(error.code)
+                    ? 'Таблиці відгуків ще немає. Адміністратору потрібно виконати оновлений supabase/schema.sql у Supabase SQL Editor.'
+                    : error.message || 'Не вдалося завантажити відгуки.';
+                reviewsStatus.classList.add('error');
+                console.error('Не вдалося завантажити відгуки:', error);
+            }
+
+            document.getElementById('reviewForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const button = document.getElementById('submitReview');
+                const status = document.getElementById('reviewStatus');
+                button.disabled = true;
+                status.classList.remove('error');
+                status.textContent = 'Публікуємо відгук...';
+
+                try {
+                    await LingoUp.createReview(document.getElementById('reviewContent').value);
+                    document.getElementById('reviewContent').value = '';
+                    status.textContent = 'Дякуємо! Ваш відгук опубліковано.';
+                    try {
+                        await loadReviews();
+                    } catch (error) {
+                        reviewsStatus.textContent = error.message || 'Відгук опубліковано, але список не вдалося оновити.';
+                        reviewsStatus.classList.add('error');
+                        console.error('Не вдалося оновити список відгуків:', error);
+                    }
+                } catch (error) {
+                    status.textContent = error.message || 'Не вдалося опублікувати відгук.';
+                    status.classList.add('error');
+                    console.error('Не вдалося опублікувати відгук:', error);
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

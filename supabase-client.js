@@ -58,5 +58,69 @@
         return data.user_type;
     }
 
-    window.LingoUp = { getClient, getProfile, getCurrentUser, updateUserType };
+    async function getReviews() {
+        const { data, error } = await getClient()
+            .from('reviews')
+            .select('id, author_name, user_type, content, created_at')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            throw error;
+        }
+        return data;
+    }
+
+    async function createReview(content) {
+        const user = await getCurrentUser();
+        if (!user) {
+            throw new Error('Увійдіть, щоб залишити відгук.');
+        }
+
+        const { error } = await getClient()
+            .from('reviews')
+            .insert({ user_id: user.id, content: content.trim() });
+
+        if (error) {
+            throw error;
+        }
+    }
+
+    async function getContacts() {
+        const { data, error } = await getClient()
+            .from('admin_contacts')
+            .select('id, label, value, created_at')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            throw error;
+        }
+        return data;
+    }
+
+    async function createContact(label, value) {
+        const normalizedLabel = label.trim();
+        const normalizedValue = value.trim();
+        if (!normalizedLabel || normalizedLabel.length > 80 || !normalizedValue || normalizedValue.length > 500) {
+            throw new Error('Вкажіть назву контакту (до 80 символів) і значення або посилання (до 500 символів).');
+        }
+
+        const { error } = await getClient()
+            .from('admin_contacts')
+            .insert({ label: normalizedLabel, value: normalizedValue });
+
+        if (error) {
+            throw error;
+        }
+    }
+
+    window.LingoUp = {
+        getClient,
+        getProfile,
+        getCurrentUser,
+        updateUserType,
+        getReviews,
+        createReview,
+        getContacts,
+        createContact
+    };
 })();

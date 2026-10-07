@@ -422,38 +422,50 @@
             }
         }
 
-        /* Переваги */
-        .features {
+        .contacts {
             max-width: 1200px;
             margin: 5rem auto;
             padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+        }
+
+        .contacts h2 {
+            margin-bottom: 1.5rem;
+            color: var(--primary-blue);
             text-align: center;
         }
 
-        .feature-card {
+        .contacts-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: 1rem;
+        }
+
+        .contact-card {
             background: var(--white);
-            padding: 2.5rem;
+            padding: 1.5rem;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
         }
 
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
+        .contact-card h3 {
+            margin-bottom: 0.5rem;
             color: var(--primary-blue);
+        }
+
+        .contact-card a {
+            color: var(--primary-green);
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        #contactsStatus {
             margin-bottom: 1rem;
-            font-size: 1.3rem;
+            color: #64748b;
+            text-align: center;
+        }
+
+        #contactsStatus.error {
+            color: #ef4444;
         }
 
         /* Підвал */
@@ -478,9 +490,9 @@
             <a href="index.html" class="logo">Lingo<span>Up</span></a>
             <ul class="nav-links">
                 <li><a href="index.html">Головна</a></li>
-                <li><a href="index.html#features">Переваги</a></li>
                 <li id="admin-link" style="display: none;"><a href="admin.html" style="color: #ef4444;">Адмінпанель</a></li>
                 <li><a href="index.html#contact">Контакти</a></li>
+                <li><a href="reviews.html">Відгуки</a></li>
             </ul>
             <a href="register.html" class="btn-primary" id="auth-cta">Почати навчання</a>
         </nav>
@@ -525,27 +537,14 @@
         <div class="hero-content">
             <h1>Твій шлях до вільної англійської</h1>
             <p>Вивчай англійську мову з LingoUp на будь-якому пристрої. Інтерактивні завдання, сучасна методика та постійна підтримка.</p>
-            <a href="#features" class="btn-primary hero-action">Обрати курс</a>
+            <a href="register.html" class="btn-primary hero-action">Почати навчання</a>
         </div>
     </section>
 
-    <!-- Переваги -->
-    <section id="features" class="features">
-        <div class="feature-card">
-            <div class="feature-icon">💻</div>
-            <h3>Навчайся будь-де</h3>
-            <p>Проходь уроки з комп'ютера або смартфону. Твій прогрес завжди синхронізується.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🚀</div>
-            <h3>Швидкий старт</h3>
-            <p>Почни говорити англійською вже з першого заняття завдяки комунікативній методиці.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">📈</div>
-            <h3>Відстежуй прогрес</h3>
-            <p>Зручна статистика та тестування допоможуть бачити твої щоденні досягнення.</p>
-        </div>
+    <section id="contact" class="contacts" aria-labelledby="contactsTitle">
+        <h2 id="contactsTitle">Контакти</h2>
+        <p id="contactsStatus" role="status" aria-live="polite">Завантаження контактів...</p>
+        <div class="contacts-list" id="contactsList"></div>
     </section>
 
     <!-- Підвал -->
@@ -557,6 +556,72 @@
     <script src="supabase-config.js"></script>
     <script src="supabase-client.js"></script>
     <script>
+        function getContactHref(value) {
+            const normalized = value.trim();
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
+                return `mailto:${normalized}`;
+            }
+            if (/^\+?[\d().\s-]{7,}$/.test(normalized)) {
+                return `tel:${normalized.replace(/[^\d+]/g, '')}`;
+            }
+
+            try {
+                const url = new URL(normalized.startsWith('www.') ? `https://${normalized}` : normalized);
+                return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
+            } catch {
+                return null;
+            }
+        }
+
+        function renderContacts(contacts) {
+            const contactsList = document.getElementById('contactsList');
+            contactsList.replaceChildren();
+
+            contacts.forEach((contact) => {
+                const card = document.createElement('article');
+                card.className = 'contact-card';
+
+                const label = document.createElement('h3');
+                label.textContent = contact.label;
+
+                const value = document.createElement('p');
+                const href = getContactHref(contact.value);
+                if (href) {
+                    const link = document.createElement('a');
+                    link.href = href;
+                    link.textContent = contact.value;
+                    if (href.startsWith('http:') || href.startsWith('https:')) {
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                    }
+                    value.appendChild(link);
+                } else {
+                    value.textContent = contact.value;
+                }
+
+                card.append(label, value);
+                contactsList.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const contactsStatus = document.getElementById('contactsStatus');
+            try {
+                const contacts = await LingoUp.getContacts();
+                renderContacts(contacts);
+                contactsStatus.classList.remove('error');
+                contactsStatus.textContent = contacts.length
+                    ? `Контактів: ${contacts.length}`
+                    : 'Адміністратор ще не додав контактів.';
+            } catch (error) {
+                contactsStatus.textContent = ['PGRST205', '42P01'].includes(error.code)
+                    ? 'Контакти ще не налаштовані. Адміністратору потрібно виконати актуальний supabase/schema.sql у Supabase SQL Editor.'
+                    : error.message || 'Не вдалося завантажити контакти.';
+                contactsStatus.classList.add('error');
+                console.error('Не вдалося завантажити контакти:', error);
+            }
+        });
+
         // Перевірка, чи користувач є адміністратором
         document.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -565,6 +630,9 @@
                     const authCta = document.getElementById('auth-cta');
                     authCta.href = 'profile.html';
                     authCta.textContent = 'Кабінет';
+                    const heroAction = document.querySelector('.hero-action');
+                    heroAction.href = 'profile.html';
+                    heroAction.textContent = 'Кабінет';
 
                     const profile = await LingoUp.getProfile(user.id);
                     if (profile.is_admin) {

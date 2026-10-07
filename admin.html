@@ -141,6 +141,69 @@
             color: var(--danger);
         }
 
+        .contact-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .contact-form label {
+            display: block;
+            margin-bottom: 0.35rem;
+            font-weight: 700;
+        }
+
+        .contact-form input {
+            width: 100%;
+            padding: 0.7rem 0.85rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .contact-form input:focus {
+            outline: 2px solid var(--primary-green);
+            border-color: transparent;
+        }
+
+        .contact-form .refresh-button {
+            justify-self: start;
+            align-self: end;
+        }
+
+        .contact-hint,
+        #contactsAdminStatus {
+            margin-top: 0.75rem;
+            color: #64748b;
+        }
+
+        #contactsAdminStatus.error {
+            color: var(--danger);
+        }
+
+        .admin-contacts {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1.25rem 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .admin-contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .admin-contact-value {
+            color: #64748b;
+            overflow-wrap: anywhere;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 0 1rem;
@@ -151,6 +214,15 @@
             }
 
             .users-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .contact-form {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-contact-item {
                 align-items: flex-start;
                 flex-direction: column;
             }
@@ -174,8 +246,26 @@
             <h2 id="adminWelcome">Вітаємо!</h2>
             <p>Ви авторизовані як адміністратор системи.</p>
             <br>
-            <p>Тут ви зможете додавати нові курси, переглядати статистику студентів та керувати налаштуваннями сайту.</p>
+            <p>Тут ви можете керувати контактами на сайті та переглядати зареєстрованих користувачів.</p>
         </div>
+        <section class="card" aria-labelledby="contactsTitle">
+            <h2 id="contactsTitle">Контакти на сторінці сайту</h2>
+            <form id="contactForm" class="contact-form">
+                <div>
+                    <label for="contactLabel">Назва</label>
+                    <input id="contactLabel" type="text" maxlength="80" required placeholder="Наприклад, Телефон">
+                </div>
+                <div>
+                    <label for="contactValue">Значення або посилання</label>
+                    <input id="contactValue" type="text" maxlength="500" required
+                        placeholder="Наприклад, +380... або email@example.com">
+                </div>
+                <button class="refresh-button" id="addContactButton" type="submit">Додати контакт</button>
+            </form>
+            <p class="contact-hint">Електронна пошта, номер телефону та вебпосилання відвідувачам будуть клікабельними.</p>
+            <p id="contactsAdminStatus" role="status" aria-live="polite">Завантаження контактів...</p>
+            <ul id="adminContactsList" class="admin-contacts"></ul>
+        </section>
         <section class="card" aria-labelledby="usersTitle">
             <div class="users-heading">
                 <h2 id="usersTitle">Зареєстровані користувачі</h2>
@@ -208,6 +298,10 @@
             const status = document.getElementById('usersStatus');
             const usersList = document.getElementById('usersList');
             const refreshButton = document.getElementById('refreshUsers');
+            const contactsStatus = document.getElementById('contactsAdminStatus');
+            const contactsList = document.getElementById('adminContactsList');
+            const contactForm = document.getElementById('contactForm');
+            const addContactButton = document.getElementById('addContactButton');
 
             let client;
             try {
@@ -229,8 +323,65 @@
                 status.textContent = error.message || 'Не вдалося перевірити права адміністратора.';
                 status.classList.add('error');
                 refreshButton.disabled = true;
+                addContactButton.disabled = true;
                 return;
             }
+
+            async function loadContacts() {
+                contactsStatus.classList.remove('error');
+                contactsStatus.textContent = 'Завантаження контактів...';
+                try {
+                    const contacts = await LingoUp.getContacts();
+                    contactsList.replaceChildren();
+                    contacts.forEach((contact) => {
+                        const item = document.createElement('li');
+                        item.className = 'admin-contact-item';
+
+                        const details = document.createElement('div');
+                        const label = document.createElement('strong');
+                        label.textContent = contact.label;
+                        const value = document.createElement('div');
+                        value.className = 'admin-contact-value';
+                        value.textContent = contact.value;
+                        details.append(label, value);
+                        item.appendChild(details);
+                        contactsList.appendChild(item);
+                    });
+                    contactsStatus.textContent = contacts.length
+                        ? `Контактів на сайті: ${contacts.length}`
+                        : 'Контактів ще немає.';
+                } catch (error) {
+                    contactsStatus.textContent = ['PGRST205', '42P01'].includes(error.code)
+                        ? 'Таблицю контактів ще не створено. Виконайте актуальний supabase/schema.sql у Supabase SQL Editor.'
+                        : error.message || 'Не вдалося завантажити контакти.';
+                    contactsStatus.classList.add('error');
+                    console.error('Не вдалося завантажити контакти адміністратора:', error);
+                }
+            }
+
+            contactForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                addContactButton.disabled = true;
+                contactsStatus.classList.remove('error');
+                contactsStatus.textContent = 'Додаємо контакт...';
+                try {
+                    await LingoUp.createContact(
+                        document.getElementById('contactLabel').value,
+                        document.getElementById('contactValue').value
+                    );
+                    contactForm.reset();
+                    contactsStatus.textContent = 'Контакт додано.';
+                    await loadContacts();
+                } catch (error) {
+                    contactsStatus.textContent = error.message || 'Не вдалося додати контакт.';
+                    contactsStatus.classList.add('error');
+                    console.error('Не вдалося додати контакт:', error);
+                } finally {
+                    addContactButton.disabled = false;
+                }
+            });
+
+            loadContacts();
 
             async function loadUsers() {
                 refreshButton.disabled = true;
