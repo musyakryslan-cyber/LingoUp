@@ -105,8 +105,8 @@
         
         <form id="loginForm">
             <div class="form-group">
-                <label for="phone">Телефон</label>
-                <input type="tel" id="phone" placeholder="Введіть номер телефону" required>
+                <label for="email">Електронна пошта</label>
+                <input type="email" id="email" placeholder="Введіть email" required>
             </div>
             
             <div class="form-group">
@@ -116,37 +116,37 @@
             
             <button type="submit" class="btn-primary">Увійти</button>
         </form>
+        <p id="authStatus" role="status" aria-live="polite"></p>
 
         <div class="auth-footer">
             Немає акаунта? <a href="register.html">Зареєструватися</a>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const user = {
-                phone: document.getElementById('phone').value,
-                password: document.getElementById('password').value
-            };
-            
+            const form = e.currentTarget;
+            const button = form.querySelector('button[type="submit"]');
+            const status = document.getElementById('authStatus');
+            button.disabled = true;
+            status.textContent = 'Входимо...';
+
             try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(user)
+                const { error } = await LingoUp.getClient().auth.signInWithPassword({
+                    email: document.getElementById('email').value.trim(),
+                    password: document.getElementById('password').value
                 });
-                
-                const result = await response.json();
-                if (result.success) {
-                    localStorage.setItem('lingoup_user', JSON.stringify(result.user));
-                    window.location.href = 'profile.html';
-                } else {
-                    alert(result.error || 'Помилка входу');
+                if (error) {
+                    throw error;
                 }
-            } catch (err) {
-                alert('Помилка з\'єднання з сервером');
+                window.location.href = 'profile.html';
+            } catch (error) {
+                status.textContent = error.message || 'Не вдалося увійти.';
+                button.disabled = false;
             }
         });
     </script>

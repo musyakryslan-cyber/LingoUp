@@ -223,13 +223,25 @@
         <p>&copy; 2026 LingoUp - Вивчення англійської мови. Всі права захищені.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
     <script>
         // Перевірка, чи користувач є адміністратором
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = JSON.parse(localStorage.getItem('lingoup_user'));
-            if (user && user.phone === '0970553310') {
-                const adminLink = document.getElementById('admin-link');
-                if (adminLink) adminLink.style.display = 'block';
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { data, error } = await LingoUp.getClient().auth.getUser();
+                if (error) {
+                    throw error;
+                }
+                if (data.user) {
+                    const profile = await LingoUp.getProfile(data.user.id);
+                    if (profile.is_admin) {
+                        document.getElementById('admin-link').style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Не вдалося перевірити обліковий запис:', error);
             }
         });
     </script>

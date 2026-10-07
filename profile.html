@@ -299,37 +299,45 @@
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = JSON.parse(localStorage.getItem('lingoup_user'));
-            
-            // Якщо користувач зареєструвався, показуємо його дані
-            if (user) {
-                document.getElementById('user-name').innerText = user.name + ' ' + user.surname;
-                document.getElementById('user-email').innerText = user.email;
-                
-                // Перевірка на адміністратора (Мисяк Руслан, 0970553310)
-                if (user.phone === '0970553310') {
-                    const adminLink = document.getElementById('admin-link');
-                    if (adminLink) adminLink.style.display = 'block';
-                    document.getElementById('user-name').innerText += ' (Адміністратор)';
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { data, error } = await LingoUp.getClient().auth.getUser();
+                if (error) {
+                    throw error;
                 }
-            }
-            
-            // Логіка виходу
-            document.querySelector('.logout-btn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    const response = await fetch('/api/logout', { method: 'POST' });
-                    if (!response.ok) {
-                        throw new Error('Не вдалося завершити серверний сеанс.');
-                    }
-                } catch (error) {
-                    alert(error.message || 'Помилка під час виходу з акаунта.');
+                if (!data.user) {
+                    window.location.href = 'login.html';
                     return;
                 }
-                localStorage.removeItem('lingoup_user');
-                window.location.href = 'index.html';
+
+                const profile = await LingoUp.getProfile(data.user.id);
+                document.getElementById('user-name').textContent =
+                    `${profile.name} ${profile.surname}${profile.is_admin ? ' (Адміністратор)' : ''}`;
+                document.getElementById('user-email').textContent = data.user.email;
+                if (profile.is_admin) {
+                    document.getElementById('admin-link').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Не вдалося завантажити профіль:', error);
+                alert(error.message || 'Не вдалося завантажити профіль.');
+                window.location.href = 'login.html';
+            }
+
+            document.querySelector('.logout-btn').addEventListener('click', async (event) => {
+                event.preventDefault();
+                try {
+                    const { error } = await LingoUp.getClient().auth.signOut();
+                    if (error) {
+                        throw error;
+                    }
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    alert(error.message || 'Не вдалося вийти з акаунта.');
+                }
             });
         });
     </script>

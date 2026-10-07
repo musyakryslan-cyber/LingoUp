@@ -138,49 +138,55 @@
             
             <div class="form-group">
                 <label for="password">Пароль</label>
-                <input type="password" id="password" placeholder="Створіть пароль" required>
+                <input type="password" id="password" placeholder="Створіть пароль" minlength="6" required>
             </div>
             
             <button type="submit" class="btn-primary">Зареєструватися</button>
         </form>
+        <p id="authStatus" role="status" aria-live="polite"></p>
 
         <div class="auth-footer">
             Вже маєте акаунт? <a href="login.html">Увійти</a>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const user = {
-                name: document.getElementById('name').value,
-                surname: document.getElementById('surname').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                password: document.getElementById('password').value
-            };
-            
+            const form = e.currentTarget;
+            const button = form.querySelector('button[type="submit"]');
+            const status = document.getElementById('authStatus');
+            button.disabled = true;
+            status.textContent = 'Створюємо акаунт...';
+
             try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(user)
+                const { data, error } = await LingoUp.getClient().auth.signUp({
+                    email: document.getElementById('email').value.trim(),
+                    password: document.getElementById('password').value,
+                    options: {
+                        data: {
+                            name: document.getElementById('name').value.trim(),
+                            surname: document.getElementById('surname').value.trim(),
+                            phone: document.getElementById('phone').value.trim()
+                        }
+                    }
                 });
-                
-                const result = await response.json();
-                if (result.success) {
-                    // Зберігаємо сесію на клієнті (без пароля)
-                    delete user.password;
-                    localStorage.setItem('lingoup_user', JSON.stringify(user));
+
+                if (error) {
+                    throw error;
+                }
+                if (data.session) {
                     window.location.href = 'profile.html';
                 } else {
-                    alert(result.error || 'Помилка реєстрації');
+                    status.textContent = 'Акаунт створено. Перевірте пошту, підтвердьте адресу та увійдіть.';
+                    form.reset();
                 }
-            } catch (err) {
-                alert('Помилка з\'єднання з сервером');
+            } catch (error) {
+                status.textContent = error.message || 'Не вдалося створити акаунт.';
+                button.disabled = false;
             }
         });
     </script>

@@ -171,7 +171,7 @@
     <div class="container">
         <h1 class="header-title">⚙️ Панель управління адміністратора</h1>
         <div class="card">
-            <h2>Вітаємо, Мисяк Руслан!</h2>
+            <h2 id="adminWelcome">Вітаємо!</h2>
             <p>Ви авторизовані як адміністратор системи.</p>
             <br>
             <p>Тут ви зможете додавати нові курси, переглядати статистику студентів та керувати налаштуваннями сайту.</p>
@@ -190,6 +190,7 @@
                             <th scope="col">Прізвище</th>
                             <th scope="col">Електронна пошта</th>
                             <th scope="col">Телефон</th>
+                            <th scope="col">Дата реєстрації</th>
                         </tr>
                     </thead>
                     <tbody id="usersList"></tbody>
@@ -198,23 +199,40 @@
         </section>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let user;
-            try {
-                user = JSON.parse(localStorage.getItem('lingoup_user'));
-            } catch (error) {
-                user = null;
-            }
-
-            if (!user || user.phone !== '0970553310') {
-                window.location.href = 'index.html';
-                return;
-            }
-
+        document.addEventListener('DOMContentLoaded', async () => {
             const status = document.getElementById('usersStatus');
             const usersList = document.getElementById('usersList');
             const refreshButton = document.getElementById('refreshUsers');
+
+            let client;
+            try {
+                client = LingoUp.getClient();
+                const { data, error } = await client.auth.getUser();
+                if (error) {
+                    throw error;
+                }
+                if (!data.user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const profile = await LingoUp.getProfile(data.user.id);
+                if (!profile.is_admin) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                document.getElementById('adminWelcome').textContent =
+                    `Вітаємо, ${profile.name} ${profile.surname}!`;
+            } catch (error) {
+                status.textContent = error.message || 'Не вдалося перевірити права адміністратора.';
+                status.classList.add('error');
+                refreshButton.disabled = true;
+                return;
+            }
 
             async function loadUsers() {
                 refreshButton.disabled = true;
@@ -222,21 +240,22 @@
                 status.textContent = 'Завантаження списку...';
 
                 try {
-                    const response = await fetch('/api/users', {
-                        credentials: 'same-origin'
-                    });
-                    const users = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(users.error || 'Не вдалося завантажити список');
+                    const { data: users, error } = await client
+                        .from('profiles')
+                        .select('name, surname, email, phone, created_at')
+                        .order('created_at', { ascending: false });
+                    if (error) {
+                        throw error;
                     }
 
                     usersList.replaceChildren();
                     users.forEach((registeredUser) => {
                         const row = document.createElement('tr');
-                        ['name', 'surname', 'email', 'phone'].forEach((field) => {
+                        ['name', 'surname', 'email', 'phone', 'created_at'].forEach((field) => {
                             const cell = document.createElement('td');
-                            cell.textContent = registeredUser[field] || '—';
+                            cell.textContent = field === 'created_at'
+                                ? new Date(registeredUser[field]).toLocaleDateString('uk-UA')
+                                : registeredUser[field] || '—';
                             row.appendChild(cell);
                         });
                         usersList.appendChild(row);
@@ -248,6 +267,7 @@
                 } catch (error) {
                     status.textContent = error.message || 'Помилка завантаження списку користувачів.';
                     status.classList.add('error');
+                    console.error('Не вдалося завантажити користувачів:', error);
                 } finally {
                     refreshButton.disabled = false;
                 }
