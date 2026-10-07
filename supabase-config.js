@@ -1,2 +1,2 @@
-window.LINGOUP_SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-window.LINGOUP_SUPABASE_ANON_KEY = 'YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY';
+window.LINGOUP_SUPABASE_URL = 'https://hmccdizehfxobzhhpdkr.supabase.co';
+window.LINGOUP_SUPABASE_ANON_KEY = 'sb_publishable_xXpVkFLtBwpNuzITuBohAQ_UfGrdKta';
