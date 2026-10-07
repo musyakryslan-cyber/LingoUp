@@ -32,5 +32,13 @@
         return data;
     }
 
-    window.LingoUp = { getClient, getProfile };
+    async function getCurrentUser() {
+        const { data, error } = await getClient().auth.getSession();
+        if (error) {
+            throw error;
+        }
+        return data.session?.user ?? null;
+    }
+
+    window.LingoUp = { getClient, getProfile, getCurrentUser };
 })();

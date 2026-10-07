@@ -230,12 +230,9 @@
         // Перевірка, чи користувач є адміністратором
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const { data, error } = await LingoUp.getClient().auth.getUser();
-                if (error) {
-                    throw error;
-                }
-                if (data.user) {
-                    const profile = await LingoUp.getProfile(data.user.id);
+                const user = await LingoUp.getCurrentUser();
+                if (user) {
+                    const profile = await LingoUp.getProfile(user.id);
                     if (profile.is_admin) {
                         document.getElementById('admin-link').style.display = 'block';
                     }

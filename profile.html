@@ -305,19 +305,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const { data, error } = await LingoUp.getClient().auth.getUser();
-                if (error) {
-                    throw error;
-                }
-                if (!data.user) {
+                const user = await LingoUp.getCurrentUser();
+                if (!user) {
                     window.location.href = 'login.html';
                     return;
                 }
 
-                const profile = await LingoUp.getProfile(data.user.id);
+                const profile = await LingoUp.getProfile(user.id);
                 document.getElementById('user-name').textContent =
                     `${profile.name} ${profile.surname}${profile.is_admin ? ' (Адміністратор)' : ''}`;
-                document.getElementById('user-email').textContent = data.user.email;
+                document.getElementById('user-email').textContent = user.email;
                 if (profile.is_admin) {
                     document.getElementById('admin-link').style.display = 'block';
                 }
