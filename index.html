@@ -1,1 +1,237 @@
-Привіт
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoUp - Вивчення англійської мови</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a; /* Темно-синій текст логотипу */
+            --primary-green: #10b981; /* Зелений колір логотипу */
+            --bg-light-blue: #e0f2fe; /* Світло-блакитний фон */
+            --text-dark: #334155;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Навігація */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--primary-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-green);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+
+        /* Hero секція */
+        .hero {
+            background-color: var(--bg-light-blue);
+            text-align: center;
+            padding-bottom: 2rem;
+        }
+
+        .hero-banner {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero h1 {
+            color: var(--primary-blue);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #475569;
+        }
+
+        /* Переваги */
+        .features {
+            max-width: 1200px;
+            margin: 5rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Підвал */
+        footer {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Навігація -->
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Lingo<span>Up</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="index.html#features">Переваги</a></li>
+                <li><a href="profile.html">Кабінет</a></li>
+                <li id="admin-link" style="display: none;"><a href="admin.html" style="color: #ef4444;">Адмінпанель</a></li>
+                <li><a href="index.html#contact">Контакти</a></li>
+            </ul>
+            <a href="register.html" class="btn-primary">Почати навчання</a>
+        </nav>
+    </header>
+
+    <!-- Головний екран -->
+    <section class="hero">
+        <img src="images/header.png" alt="LingoUp Банер" class="hero-banner">
+        <div class="hero-content">
+            <h1>Твій шлях до вільної англійської</h1>
+            <p>Вивчай англійську мову з LingoUp на будь-якому пристрої. Інтерактивні завдання, сучасна методика та постійна підтримка.</p>
+            <a href="#courses" class="btn-primary" style="font-size: 1.2rem; padding: 1rem 2.5rem;">Обрати курс</a>
+        </div>
+    </section>
+
+    <!-- Переваги -->
+    <section id="features" class="features">
+        <div class="feature-card">
+            <div class="feature-icon">💻</div>
+            <h3>Навчайся будь-де</h3>
+            <p>Проходь уроки з комп'ютера або смартфону. Твій прогрес завжди синхронізується.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3>Швидкий старт</h3>
+            <p>Почни говорити англійською вже з першого заняття завдяки комунікативній методиці.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>Відстежуй прогрес</h3>
+            <p>Зручна статистика та тестування допоможуть бачити твої щоденні досягнення.</p>
+        </div>
+    </section>
+
+    <!-- Підвал -->
+    <footer>
+        <p>&copy; 2026 LingoUp - Вивчення англійської мови. Всі права захищені.</p>
+    </footer>
+
+    <script>
+        // Перевірка, чи користувач є адміністратором
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('lingoup_user'));
+            if (user && user.phone === '0970553310') {
+                const adminLink = document.getElementById('admin-link');
+                if (adminLink) adminLink.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
