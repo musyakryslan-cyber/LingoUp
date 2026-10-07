@@ -94,16 +94,207 @@
 
         /* Hero секція */
         .hero {
-            background-color: var(--bg-light-blue);
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            min-height: 430px;
+            padding: 3rem 2rem 2.5rem;
+            background: linear-gradient(135deg, #eff6ff 0%, #ecfdf5 55%, #f0f9ff 100%);
             text-align: center;
-            padding-bottom: 2rem;
         }
 
-        .hero-banner {
+        .hero::before,
+        .hero::after {
+            position: absolute;
+            z-index: -1;
+            border-radius: 50%;
+            content: "";
+            filter: blur(2px);
+        }
+
+        .hero::before {
+            width: 280px;
+            height: 280px;
+            top: -130px;
+            left: -70px;
+            background: rgba(96, 165, 250, 0.12);
+        }
+
+        .hero::after {
+            width: 340px;
+            height: 340px;
+            right: -110px;
+            bottom: -200px;
+            background: rgba(52, 211, 153, 0.15);
+        }
+
+        .hero-visual {
+            width: min(100%, 900px);
+            min-height: 235px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(1rem, 7vw, 5rem);
+        }
+
+        .device-phone,
+        .device-laptop {
+            flex: 0 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .device-phone {
+            animation: float-phone 5s ease-in-out infinite;
+            transform: rotate(-10deg);
+        }
+
+        .phone-body {
+            width: 76px;
+            height: 142px;
+            padding: 7px;
+            border: 3px solid #334155;
+            border-radius: 17px;
+            background: #0f172a;
+            box-shadow: 0 16px 28px rgba(15, 23, 42, 0.2);
+        }
+
+        .phone-screen {
             width: 100%;
-            max-height: 500px;
-            object-fit: cover;
-            object-position: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 10px;
+            background: linear-gradient(160deg, #dbeafe, #dcfce7);
+        }
+
+        .badge-level {
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: #fff;
+            color: #1e3a8a;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .phone-icon-svg {
+            width: 32px;
+            fill: none;
+            stroke: #16a34a;
+            stroke-width: 1.6;
+        }
+
+        .brand-core {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .bubble-tag {
+            display: inline-block;
+            margin-bottom: 0.6rem;
+            padding: 0.35rem 1rem;
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #166534;
+            font-size: 0.9rem;
+            font-weight: 800;
+            animation: bubble-bounce 3s ease-in-out infinite;
+        }
+
+        .logo-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            white-space: nowrap;
+        }
+
+        .logo-text-lingo,
+        .logo-text-up {
+            font-size: clamp(3.2rem, 8vw, 5.7rem);
+            font-weight: 800;
+            letter-spacing: -0.07em;
+            line-height: 1;
+        }
+
+        .logo-text-lingo {
+            color: #1e3a8a;
+        }
+
+        .logo-text-up {
+            color: #16a34a;
+        }
+
+        .arrow-icon {
+            width: clamp(30px, 5vw, 46px);
+            margin-left: 0.25rem;
+        }
+
+        .slogan {
+            margin-top: 0.7rem;
+            color: #475569;
+            font-size: clamp(0.7rem, 2vw, 0.95rem);
+            font-weight: 800;
+            letter-spacing: 0.14em;
+        }
+
+        .device-laptop {
+            animation: float-laptop 5s ease-in-out infinite;
+            transform: perspective(600px) rotateY(-14deg) rotateZ(2deg);
+        }
+
+        .laptop-lid {
+            width: 170px;
+            height: 105px;
+            padding: 6px;
+            border-radius: 8px 8px 0 0;
+            background: #1e293b;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
+        }
+
+        .laptop-display {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .progress-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            background: #f1f5f9;
+            color: #0f172a;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .progress-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #16a34a;
+        }
+
+        .laptop-keyboard {
+            width: 200px;
+            height: 8px;
+            margin: 0 auto;
+            border-radius: 0 0 6px 6px;
+            background: #94a3b8;
         }
 
         .hero-content {
@@ -122,6 +313,113 @@
             font-size: 1.2rem;
             margin-bottom: 2rem;
             color: #475569;
+        }
+
+        .hero-action {
+            font-size: 1.1rem;
+            padding: 0.9rem 2rem;
+        }
+
+        @keyframes float-phone {
+            0%, 100% { transform: rotate(-10deg) translateY(4px); }
+            50% { transform: rotate(-8deg) translateY(-4px); }
+        }
+
+        @keyframes float-laptop {
+            0%, 100% { transform: perspective(600px) rotateY(-14deg) rotateZ(2deg) translateY(0); }
+            50% { transform: perspective(600px) rotateY(-11deg) rotateZ(3deg) translateY(-6px); }
+        }
+
+        @keyframes bubble-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .navbar .logo {
+                font-size: 1.5rem;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 0.75rem 1.25rem;
+            }
+
+            .navbar > .btn-primary {
+                padding: 0.6rem 1rem;
+            }
+
+            .hero {
+                min-height: auto;
+                padding: 2.5rem 1rem 2rem;
+            }
+
+            .hero-visual {
+                min-height: 190px;
+                gap: 1rem;
+            }
+
+            .phone-body {
+                width: 58px;
+                height: 112px;
+                border-radius: 14px;
+            }
+
+            .laptop-lid {
+                width: 120px;
+                height: 78px;
+            }
+
+            .laptop-keyboard {
+                width: 140px;
+            }
+
+            .hero-content {
+                padding: 2rem 0.5rem 0;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .device-phone {
+                display: none;
+            }
+
+            .hero-visual {
+                min-height: 160px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .device-phone,
+            .device-laptop,
+            .bubble-tag {
+                animation: none;
+            }
+
+            .device-phone {
+                transform: rotate(-8deg);
+            }
+
+            .device-laptop {
+                transform: perspective(600px) rotateY(-11deg) rotateZ(2deg);
+            }
         }
 
         /* Переваги */
@@ -190,11 +488,44 @@
 
     <!-- Головний екран -->
     <section class="hero">
-        <img src="images/header.png" alt="LingoUp Банер" class="hero-banner">
+        <div class="hero-visual" aria-hidden="true">
+            <div class="device-phone">
+                <div class="phone-body">
+                    <div class="phone-screen">
+                        <span class="badge-level">A1 → C1</span>
+                        <svg class="phone-icon-svg" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="brand-core">
+                <div class="bubble-tag">Speak freely! 🇬🇧</div>
+                <div class="logo-row">
+                    <span class="logo-text-lingo">Lingo</span><span class="logo-text-up">Up</span>
+                    <svg class="arrow-icon" viewBox="0 0 48 48" fill="none">
+                        <path d="M8 38 L20 24 L28 30 L40 12" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M30 12 H40 V22" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="slogan">ВИВЧЕННЯ АНГЛІЙСЬКОЇ МОВИ</div>
+            </div>
+            <div class="device-laptop">
+                <div class="laptop-lid">
+                    <div class="laptop-display">
+                        <div class="progress-pill">
+                            <div class="progress-dot"></div>
+                            <span>Daily Goal: 100%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="laptop-keyboard"></div>
+            </div>
+        </div>
         <div class="hero-content">
             <h1>Твій шлях до вільної англійської</h1>
             <p>Вивчай англійську мову з LingoUp на будь-якому пристрої. Інтерактивні завдання, сучасна методика та постійна підтримка.</p>
-            <a href="#courses" class="btn-primary" style="font-size: 1.2rem; padding: 1rem 2.5rem;">Обрати курс</a>
+            <a href="#features" class="btn-primary hero-action">Обрати курс</a>
         </div>
     </section>
 
