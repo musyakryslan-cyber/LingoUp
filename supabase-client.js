@@ -40,5 +40,23 @@
         return data.session?.user ?? null;
     }
 
-    window.LingoUp = { getClient, getProfile, getCurrentUser };
+    async function updateUserType(userId, userType) {
+        if (!['student', 'teacher'].includes(userType)) {
+            throw new Error('Оберіть тип користувача: студент або вчитель.');
+        }
+
+        const { data, error } = await getClient()
+            .from('profiles')
+            .update({ user_type: userType })
+            .eq('id', userId)
+            .select('user_type')
+            .single();
+
+        if (error) {
+            throw error;
+        }
+        return data.user_type;
+    }
+
+    window.LingoUp = { getClient, getProfile, getCurrentUser, updateUserType };
 })();

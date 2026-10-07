@@ -123,6 +123,53 @@
             margin-bottom: 1.5rem;
         }
 
+        .profile-type-form {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .profile-type-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .profile-type-form select {
+            width: 100%;
+            padding: 0.65rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: var(--white);
+            font-size: 1rem;
+        }
+
+        .profile-type-form button {
+            width: 100%;
+            margin-top: 0.6rem;
+            padding: 0.65rem;
+            border: 0;
+            border-radius: 50px;
+            background: var(--primary-green);
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .profile-type-form button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+        #profileTypeStatus {
+            margin: 0.5rem 0 0;
+            font-size: 0.9rem;
+        }
+
+        #profileTypeStatus.error {
+            color: #ef4444;
+        }
+
         .stats {
             display: flex;
             justify-content: space-around;
@@ -245,6 +292,15 @@
             <h2 id="user-name">Студент</h2>
             <p id="user-email">student@example.com</p>
             <p id="user-type"></p>
+            <form class="profile-type-form" id="profileTypeForm">
+                <label for="profileUserType">Тип акаунта</label>
+                <select id="profileUserType" required>
+                    <option value="student">Студент</option>
+                    <option value="teacher">Учитель</option>
+                </select>
+                <button type="submit">Зберегти тип</button>
+                <p id="profileTypeStatus" role="status" aria-live="polite"></p>
+            </form>
             
             <div class="stats">
                 <div class="stat-item">
@@ -318,6 +374,7 @@
                 document.getElementById('user-email').textContent = user.email;
                 document.getElementById('user-type').textContent =
                     profile.user_type === 'teacher' ? 'Учитель' : 'Студент';
+                document.getElementById('profileUserType').value = profile.user_type;
                 if (profile.is_admin) {
                     document.getElementById('admin-link').style.display = 'block';
                 }
@@ -325,7 +382,39 @@
                 console.error('Не вдалося завантажити профіль:', error);
                 alert(error.message || 'Не вдалося завантажити профіль.');
                 window.location.href = 'login.html';
+                return;
             }
+
+            document.getElementById('profileTypeForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const button = form.querySelector('button[type="submit"]');
+                const status = document.getElementById('profileTypeStatus');
+                button.disabled = true;
+                status.classList.remove('error');
+                status.textContent = 'Зберігаємо...';
+
+                try {
+                    const user = await LingoUp.getCurrentUser();
+                    if (!user) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    const userType = await LingoUp.updateUserType(
+                        user.id,
+                        document.getElementById('profileUserType').value
+                    );
+                    document.getElementById('user-type').textContent =
+                        userType === 'teacher' ? 'Учитель' : 'Студент';
+                    status.textContent = 'Тип акаунта оновлено.';
+                } catch (error) {
+                    status.textContent = error.message || 'Не вдалося оновити тип акаунта.';
+                    status.classList.add('error');
+                    console.error('Не вдалося оновити тип акаунта:', error);
+                } finally {
+                    button.disabled = false;
+                }
+            });
 
             document.querySelector('.logout-btn').addEventListener('click', async (event) => {
                 event.preventDefault();

@@ -21,6 +21,7 @@ alter table public.profiles
 alter table public.profiles enable row level security;
 revoke all on table public.profiles from anon, authenticated;
 grant select on table public.profiles to authenticated;
+grant update (user_type) on table public.profiles to authenticated;
 
 create or replace function public.is_lingoup_admin()
 returns boolean
@@ -47,6 +48,14 @@ create policy "Users can read their own profile and admins can read all profiles
     for select
     to authenticated
     using ((select auth.uid()) = id or (select public.is_lingoup_admin()));
+
+drop policy if exists "Users can update their own profile type" on public.profiles;
+create policy "Users can update their own profile type"
+    on public.profiles
+    for update
+    to authenticated
+    using ((select auth.uid()) = id)
+    with check ((select auth.uid()) = id);
 
 create or replace function public.create_lingoup_profile()
 returns trigger
