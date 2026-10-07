@@ -190,6 +190,7 @@
                             <th scope="col">Прізвище</th>
                             <th scope="col">Електронна пошта</th>
                             <th scope="col">Телефон</th>
+                            <th scope="col">Тип користувача</th>
                             <th scope="col">Дата реєстрації</th>
                         </tr>
                     </thead>
@@ -239,7 +240,7 @@
                 try {
                     const { data: users, error } = await client
                         .from('profiles')
-                        .select('name, surname, email, phone, created_at')
+                        .select('name, surname, email, phone, user_type, created_at')
                         .order('created_at', { ascending: false });
                     if (error) {
                         throw error;
@@ -248,11 +249,15 @@
                     usersList.replaceChildren();
                     users.forEach((registeredUser) => {
                         const row = document.createElement('tr');
-                        ['name', 'surname', 'email', 'phone', 'created_at'].forEach((field) => {
+                        ['name', 'surname', 'email', 'phone', 'user_type', 'created_at'].forEach((field) => {
                             const cell = document.createElement('td');
-                            cell.textContent = field === 'created_at'
-                                ? new Date(registeredUser[field]).toLocaleDateString('uk-UA')
-                                : registeredUser[field] || '—';
+                            if (field === 'created_at') {
+                                cell.textContent = new Date(registeredUser[field]).toLocaleDateString('uk-UA');
+                            } else if (field === 'user_type') {
+                                cell.textContent = registeredUser[field] === 'teacher' ? 'Учитель' : 'Студент';
+                            } else {
+                                cell.textContent = registeredUser[field] || '—';
+                            }
                             row.appendChild(cell);
                         });
                         usersList.appendChild(row);

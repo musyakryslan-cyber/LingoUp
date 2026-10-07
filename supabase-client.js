@@ -22,7 +22,7 @@
     async function getProfile(userId) {
         const { data, error } = await getClient()
             .from('profiles')
-            .select('name, surname, email, phone, is_admin')
+            .select('name, surname, email, phone, user_type, is_admin')
             .eq('id', userId)
             .single();
 

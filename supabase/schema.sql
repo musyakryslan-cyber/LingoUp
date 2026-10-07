@@ -4,9 +4,19 @@ create table if not exists public.profiles (
     surname text not null default '',
     email text not null default '',
     phone text not null default '',
+    user_type text not null default 'student',
     is_admin boolean not null default false,
     created_at timestamptz not null default now()
 );
+
+alter table public.profiles
+    add column if not exists user_type text not null default 'student';
+
+alter table public.profiles
+    drop constraint if exists profiles_user_type_check;
+alter table public.profiles
+    add constraint profiles_user_type_check
+    check (user_type in ('student', 'teacher'));
 
 alter table public.profiles enable row level security;
 revoke all on table public.profiles from anon, authenticated;
@@ -45,13 +55,18 @@ security definer
 set search_path = ''
 as $$
 begin
-    insert into public.profiles (id, name, surname, email, phone)
+    insert into public.profiles (id, name, surname, email, phone, user_type)
     values (
         new.id,
         coalesce(new.raw_user_meta_data ->> 'name', ''),
         coalesce(new.raw_user_meta_data ->> 'surname', ''),
         coalesce(new.email, ''),
-        coalesce(new.raw_user_meta_data ->> 'phone', '')
+        coalesce(new.raw_user_meta_data ->> 'phone', ''),
+        case
+            when new.raw_user_meta_data ->> 'user_type' in ('student', 'teacher')
+                then new.raw_user_meta_data ->> 'user_type'
+            else 'student'
+        end
     );
     return new;
 end;

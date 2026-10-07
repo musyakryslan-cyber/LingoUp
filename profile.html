@@ -244,6 +244,7 @@
             <div class="avatar">👨‍🎓</div>
             <h2 id="user-name">Студент</h2>
             <p id="user-email">student@example.com</p>
+            <p id="user-type"></p>
             
             <div class="stats">
                 <div class="stat-item">
@@ -315,6 +316,8 @@
                 document.getElementById('user-name').textContent =
                     `${profile.name} ${profile.surname}${profile.is_admin ? ' (Адміністратор)' : ''}`;
                 document.getElementById('user-email').textContent = user.email;
+                document.getElementById('user-type').textContent =
+                    profile.user_type === 'teacher' ? 'Учитель' : 'Студент';
                 if (profile.is_admin) {
                     document.getElementById('admin-link').style.display = 'block';
                 }
