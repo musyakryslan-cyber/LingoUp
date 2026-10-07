@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмінпанель - LingoUp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-green: #10b981;
+            --bg-light-blue: #e0f2fe;
+            --text-dark: #334155;
+            --white: #ffffff;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        
+        .header-title {
+            color: var(--danger);
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .users-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .users-heading h2 {
+            color: var(--primary-blue);
+        }
+
+        .refresh-button {
+            background: var(--primary-green);
+            color: var(--white);
+            border: 0;
+            border-radius: 50px;
+            padding: 0.65rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .refresh-button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .users-table th {
+            color: var(--primary-blue);
+            white-space: nowrap;
+        }
+
+        #usersStatus {
+            margin-bottom: 1rem;
+            color: #64748b;
+        }
+
+        #usersStatus.error {
+            color: var(--danger);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+
+            .users-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">LingoUp <span>Admin</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">На сайт</a></li>
+                <li><a href="profile.html">Мій кабінет</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="header-title">⚙️ Панель управління адміністратора</h1>
+        <div class="card">
+            <h2>Вітаємо, Мисяк Руслан!</h2>
+            <p>Ви авторизовані як адміністратор системи.</p>
+            <br>
+            <p>Тут ви зможете додавати нові курси, переглядати статистику студентів та керувати налаштуваннями сайту.</p>
+        </div>
+        <section class="card" aria-labelledby="usersTitle">
+            <div class="users-heading">
+                <h2 id="usersTitle">Зареєстровані користувачі</h2>
+                <button class="refresh-button" id="refreshUsers" type="button">Оновити список</button>
+            </div>
+            <p id="usersStatus" role="status" aria-live="polite">Завантаження списку...</p>
+            <div class="table-wrapper">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ім'я</th>
+                            <th scope="col">Прізвище</th>
+                            <th scope="col">Електронна пошта</th>
+                            <th scope="col">Телефон</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let user;
+            try {
+                user = JSON.parse(localStorage.getItem('lingoup_user'));
+            } catch (error) {
+                user = null;
+            }
+
+            if (!user || user.phone !== '0970553310') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const status = document.getElementById('usersStatus');
+            const usersList = document.getElementById('usersList');
+            const refreshButton = document.getElementById('refreshUsers');
+
+            async function loadUsers() {
+                refreshButton.disabled = true;
+                status.classList.remove('error');
+                status.textContent = 'Завантаження списку...';
+
+                try {
+                    const response = await fetch('/api/users', {
+                        credentials: 'same-origin'
+                    });
+                    const users = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(users.error || 'Не вдалося завантажити список');
+                    }
+
+                    usersList.replaceChildren();
+                    users.forEach((registeredUser) => {
+                        const row = document.createElement('tr');
+                        ['name', 'surname', 'email', 'phone'].forEach((field) => {
+                            const cell = document.createElement('td');
+                            cell.textContent = registeredUser[field] || '—';
+                            row.appendChild(cell);
+                        });
+                        usersList.appendChild(row);
+                    });
+
+                    status.textContent = users.length
+                        ? `Усього користувачів: ${users.length}`
+                        : 'Ще немає зареєстрованих користувачів.';
+                } catch (error) {
+                    status.textContent = error.message || 'Помилка завантаження списку користувачів.';
+                    status.classList.add('error');
+                } finally {
+                    refreshButton.disabled = false;
+                }
+            }
+
+            refreshButton.addEventListener('click', loadUsers);
+            loadUsers();
+        });
+    </script>
+</body>
+</html>
