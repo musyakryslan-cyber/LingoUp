@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Навчання - LingoUp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-green: #10b981;
+            --bg-light-blue: #e0f2fe;
+            --text-dark: #334155;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-indicator {
+            position: absolute;
+            left: 50%;
+            top: 0.35rem;
+            transform: translateX(-50%);
+            max-width: 1200px;
+            width: calc(100% - 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .page-indicator-list {
+            list-style: none;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .page-indicator-list span {
+            display: inline-flex;
+            min-width: auto;
+            height: auto;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+        }
+
+        .page-indicator-list .active {
+            background: transparent;
+            color: var(--primary-green);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--primary-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-green);
+        }
+
+        .nav-links a.active,
+        .nav-links a[aria-current="page"] {
+            color: var(--primary-green);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .exercise-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+            margin-top: 2rem;
+        }
+
+        .exercise-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 110px;
+            padding: 1.25rem;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #eff6ff, #ecfdf5);
+            border: 1px solid #c7d2fe;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .exercise-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 22px rgba(16, 185, 129, 0.12);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-header h1 {
+            color: var(--primary-blue);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 0.8rem;
+        }
+
+        .page-header p {
+            color: #475569;
+            font-size: 1.1rem;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .upload-panel {
+            margin-top: 2rem;
+            background: linear-gradient(135deg, #eff6ff, #ecfdf5);
+            border: 1px solid #bfdbfe;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .upload-header h2 {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+        }
+
+        .upload-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .upload-btn, .action-btn {
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.98rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .upload-btn {
+            background: var(--primary-green);
+            color: var(--white);
+            padding: 0.85rem 1.3rem;
+            box-shadow: 0 10px 18px rgba(16, 185, 129, 0.18);
+        }
+
+        .document-viewer {
+            display: none;
+            margin-top: 1.25rem;
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 1.25rem;
+        }
+
+        .document-viewer.visible {
+            display: block;
+        }
+
+        .document-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .document-meta strong {
+            color: var(--primary-blue);
+        }
+
+        .document-tools {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            padding: 0.7rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover, .upload-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .document-content {
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            line-height: 1.8;
+            color: var(--text-dark);
+            white-space: pre-wrap;
+        }
+
+        .document-translation {
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            border-radius: 14px;
+            color: #065f46;
+            display: none;
+            line-height: 1.8;
+        }
+
+        .document-translation.visible {
+            display: block;
+        }
+
+        .doc-preview-image {
+            max-width: 100%;
+            border-radius: 14px;
+            border: 1px solid #dbeafe;
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .doc-preview-image.visible {
+            display: block;
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .exercise-card {
+            background: var(--white);
+            border-radius: 22px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .exercise-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #dbeafe, #dcfce7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .exercise-card h3 {
+            color: var(--primary-blue);
+            font-size: 1.4rem;
+        }
+
+        .exercise-card p {
+            color: #64748b;
+            flex: 1;
+        }
+
+        .exercise-btn {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            padding: 0.7rem 1rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .exercise-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 0.75rem 1.25rem;
+            }
+
+            .page {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-indicator">
+            <ul class="page-indicator-list">
+                <li><span>1.1</span></li>
+                <li><span class="active">2.1</span></li>
+                <li><span>3.1</span></li>
+                <li><span>4.1</span></li>
+                <li id="page-admin-link" style="display: none;"><span>5.1</span></li>
+            </ul>
+        </div>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Lingo<span>Up</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="learning.html" aria-current="page" class="active">Навчання</a></li>
+                <li><a href="index.html#contact">Контакти</a></li>
+                <li><a href="reviews.html">Відгуки</a></li>
+                <li id="admin-link" style="display: none;"><a href="admin.html">Адмінпанель</a></li>
+            </ul>
+            <a href="profile.html" class="btn-primary">Кабінет</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <div class="page-header">
+            <h1>Навчання</h1>
+        </div>
+
+        <div class="exercise-board">
+            <a href="reading.html" class="exercise-button">Читання</a>
+            <a href="listening.html" class="exercise-button">Аудіювання</a>
+            <a href="vocabulary.html" class="exercise-button">Словникові вправи</a>
+            <a href="grammar.html" class="exercise-button">Граматика</a>
+            <a href="writing.html" class="exercise-button">Письмо</a>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js?v=2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const user = await LingoUp.getCurrentUser();
+                if (user) {
+                    const profile = await LingoUp.getProfile(user.id);
+                    if (profile.is_admin) {
+                        const adminLinks = [
+                            document.getElementById('admin-link'),
+                            document.getElementById('page-admin-link')
+                        ].filter(Boolean);
+                        adminLinks.forEach((adminLink) => {
+                            adminLink.style.display = 'list-item';
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Не вдалося перевірити обліковий запис:', error);
+            }
+        });
+    </script>
+</body>
+</html>

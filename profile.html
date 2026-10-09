@@ -36,6 +36,52 @@
             z-index: 100;
         }
 
+        .page-indicator {
+            position: absolute;
+            left: 50%;
+            top: 0.35rem;
+            transform: translateX(-50%);
+            max-width: 1200px;
+            width: calc(100% - 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .page-indicator-list {
+            list-style: none;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .page-indicator-list span {
+            display: inline-flex;
+            min-width: auto;
+            height: auto;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+        }
+
+        .page-indicator-list .active {
+            background: transparent;
+            color: var(--primary-green);
+        }
+
         .navbar {
             max-width: 1200px;
             margin: 0 auto;
@@ -68,12 +114,17 @@
 
         .nav-links a {
             text-decoration: none;
-            color: var(--text-dark);
+            color: var(--primary-blue);
             font-weight: 700;
             transition: color 0.3s;
         }
 
         .nav-links a:hover {
+            color: var(--primary-green);
+        }
+
+        .nav-links a.active,
+        .nav-links a[aria-current="page"] {
             color: var(--primary-green);
         }
         
@@ -101,16 +152,46 @@
             height: fit-content;
         }
 
+        .avatar-area {
+            margin: 0 auto 1rem;
+            width: 120px;
+        }
+
+        .avatar-upload {
+            display: block;
+            position: relative;
+            cursor: pointer;
+        }
+
         .avatar {
             width: 120px;
             height: 120px;
             background-color: var(--bg-light-blue);
             border-radius: 50%;
-            margin: 0 auto 1rem;
+            margin: 0 auto 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3rem;
+            overflow: hidden;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            border: 3px solid rgba(30, 58, 138, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .avatar-upload:hover .avatar {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(14, 116, 144, 0.12);
+        }
+
+        .avatar-edit {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-align: center;
         }
 
         .profile-sidebar h2 {
@@ -198,6 +279,17 @@
             gap: 2rem;
         }
 
+        .student-dashboard,
+        .teacher-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         .card {
             background: var(--white);
             padding: 2rem;
@@ -209,6 +301,223 @@
             color: var(--primary-blue);
             margin-bottom: 1.5rem;
             font-size: 1.4rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .teacher-badge {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--primary-green);
+            border-radius: 999px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        .teacher-summary-grid,
+        .group-grid,
+        .teacher-two-column {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .teacher-summary-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .summary-stat {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1rem 1.1rem;
+        }
+
+        .summary-label {
+            display: block;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .summary-stat strong {
+            display: block;
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+            line-height: 1.2;
+        }
+
+        .summary-stat small {
+            display: block;
+            margin-top: 0.3rem;
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+
+        .group-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .group-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #f8fbff 0%, #f0fdf4 100%);
+        }
+
+        .group-card-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.7rem;
+        }
+
+        .group-card h4 {
+            color: var(--primary-blue);
+            font-size: 1.1rem;
+        }
+
+        .group-badge {
+            background: var(--primary-green);
+            color: var(--white);
+            border-radius: 999px;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .group-meta {
+            color: #64748b;
+            margin-bottom: 0.9rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-green);
+            width: 45%;
+            border-radius: 5px;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-align: right;
+        }
+
+        .lesson-list,
+        .feedback-list,
+        .schedule-list {
+            list-style: none;
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .lesson-item,
+        .feedback-item,
+        .schedule-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .lesson-main,
+        .feedback-main {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .lesson-time {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 72px;
+            height: 42px;
+            background: var(--bg-light-blue);
+            color: var(--primary-blue);
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.88rem;
+        }
+
+        .lesson-name,
+        .feedback-name {
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .lesson-subtitle,
+        .feedback-text,
+        .schedule-item span {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .status-pill {
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-pill.primary {
+            background: rgba(30, 58, 138, 0.08);
+            color: var(--primary-blue);
+        }
+
+        .status-pill.success {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--primary-green);
+        }
+
+        .teacher-two-column {
+            grid-template-columns: 1.1fr 0.9fr;
+        }
+
+        .feedback-item {
+            display: block;
+        }
+
+        .feedback-stars {
+            color: #fbbf24;
+            letter-spacing: 0.08em;
+            margin-top: 0.4rem;
+            font-size: 0.9rem;
+        }
+
+        .schedule-item {
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .schedule-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            margin-right: 0.75rem;
+            flex-shrink: 0;
         }
 
         /* Прогрес курсу */
@@ -231,28 +540,6 @@
             font-size: 1.1rem;
         }
 
-        .progress-bar-container {
-            width: 100%;
-            height: 10px;
-            background-color: #e2e8f0;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: var(--primary-green);
-            width: 45%; /* Приклад прогресу */
-            border-radius: 5px;
-        }
-
-        .progress-text {
-            font-size: 0.9rem;
-            color: #64748b;
-            text-align: right;
-        }
-        
         .btn-continue {
             background-color: var(--bg-light-blue);
             color: var(--primary-blue);
@@ -270,17 +557,75 @@
             background-color: #bae6fd;
         }
 
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .teacher-summary-grid,
+            .group-grid,
+            .teacher-two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .dashboard {
+                padding: 0 1rem;
+                margin: 2rem auto;
+            }
+
+            .profile-sidebar,
+            .card {
+                padding: 1.25rem;
+            }
+
+            .section-header,
+            .group-card-header,
+            .lesson-item,
+            .course-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
     </style>
 </head>
 <body>
 
     <!-- Навігація -->
     <header>
+        <div class="page-indicator">
+            <ul class="page-indicator-list">
+                <li><span>1.1</span></li>
+                <li><span>2.1</span></li>
+                <li><span>3.1</span></li>
+                <li><span>4.1</span></li>
+                <li><span class="active">5.1</span></li>
+                <li id="page-admin-link" style="display: none;"><span>6.1</span></li>
+            </ul>
+        </div>
         <nav class="navbar">
             <a href="index.html" class="logo">Lingo<span>Up</span></a>
             <ul class="nav-links">
                 <li><a href="index.html">Головна</a></li>
-                <li><a href="profile.html" style="color: var(--primary-green);">Мій кабінет</a></li>
+                <li><a href="learning.html">Навчання</a></li>
+                <li><a href="index.html#contact">Контакти</a></li>
+                <li><a href="reviews.html">Відгуки</a></li>
+                <li><a href="profile.html" aria-current="page" class="active">Мій кабінет</a></li>
                 <li id="admin-link" style="display: none;"><a href="admin.html" style="color: #ef4444;">Адмінпанель</a></li>
                 <li><a href="index.html" class="logout-btn">Вийти</a></li>
             </ul>
@@ -291,7 +636,13 @@
     <div class="dashboard">
         <!-- Бокова панель -->
         <aside class="profile-sidebar">
-            <div class="avatar">👨‍🎓</div>
+            <div class="avatar-area">
+                <label class="avatar-upload" for="avatarInput">
+                    <div class="avatar" id="userAvatar" aria-label="Аватар користувача">👨‍🎓</div>
+                    <span class="avatar-edit">Змінити фото</span>
+                </label>
+                <input id="avatarInput" type="file" accept="image/*" hidden>
+            </div>
             <h2 id="user-name">Студент</h2>
             <p id="user-email">student@example.com</p>
             <p id="user-type"></p>
@@ -320,41 +671,208 @@
 
         <!-- Основна частина -->
         <main class="main-content">
-            <div class="card">
-                <h3>Мої поточні курси</h3>
-                
-                <div class="course-item">
-                    <div class="course-header">
-                        <span class="course-title">Англійська для початківців (A1)</span>
-                        <span>Модуль 3 з 10</span>
+            <div id="studentDashboard" class="student-dashboard">
+                <div class="card">
+                    <h3>Мої поточні курси</h3>
+                    
+                    <div class="course-item">
+                        <div class="course-header">
+                            <span class="course-title">Англійська для початківців (A1)</span>
+                            <span>Модуль 3 з 10</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 45%;"></div>
+                        </div>
+                        <div class="progress-text">Пройдено 45%</div>
+                        <a href="#" class="btn-continue">Продовжити урок</a>
                     </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 45%;"></div>
+
+                    <div class="course-item">
+                        <div class="course-header">
+                            <span class="course-title">Розмовна практика (B1)</span>
+                            <span>Модуль 1 з 5</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 15%;"></div>
+                        </div>
+                        <div class="progress-text">Пройдено 15%</div>
+                        <a href="#" class="btn-continue">Продовжити урок</a>
                     </div>
-                    <div class="progress-text">Пройдено 45%</div>
-                    <a href="#" class="btn-continue">Продовжити урок</a>
                 </div>
 
-                <div class="course-item">
-                    <div class="course-header">
-                        <span class="course-title">Розмовна практика (B1)</span>
-                        <span>Модуль 1 з 5</span>
+                <div class="card">
+                    <h3>Досягнення</h3>
+                    <p style="color: #64748b;">Тут з'являться ваші нагороди за проходження уроків.</p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem; font-size: 2rem;">
+                        <span title="Перший урок">🎯</span>
+                        <span title="3 дні поспіль" style="opacity: 0.3;">🔥</span>
+                        <span title="Ідеальний тест" style="opacity: 0.3;">⭐</span>
                     </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 15%;"></div>
-                    </div>
-                    <div class="progress-text">Пройдено 15%</div>
-                    <a href="#" class="btn-continue">Продовжити урок</a>
                 </div>
             </div>
 
-            <div class="card">
-                <h3>Досягнення</h3>
-                <p style="color: #64748b;">Тут з'являться ваші нагороди за проходження уроків.</p>
-                <div style="display: flex; gap: 1rem; margin-top: 1rem; font-size: 2rem;">
-                    <span title="Перший урок">🎯</span>
-                    <span title="3 дні поспіль" style="opacity: 0.3;">🔥</span>
-                    <span title="Ідеальний тест" style="opacity: 0.3;">⭐</span>
+            <div id="teacherDashboard" class="teacher-dashboard hidden">
+                <div class="card">
+                    <div class="section-header">
+                        <h3>Панель викладача</h3>
+                        <span class="teacher-badge">Онлайн</span>
+                    </div>
+
+                    <div class="teacher-summary-grid">
+                        <div class="summary-stat">
+                            <span class="summary-label">Активні учні</span>
+                            <strong>128</strong>
+                            <small>+12 у цьому місяці</small>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Груп</span>
+                            <strong>6</strong>
+                            <small>2 потребують уваги</small>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Рейтинг</span>
+                            <strong>4.9</strong>
+                            <small>Найкращий у центрі</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <h3>Мої групи</h3>
+                    </div>
+
+                    <div class="group-grid">
+                        <article class="group-card">
+                            <div class="group-card-header">
+                                <h4>Beginner A1</h4>
+                                <span class="group-badge">18 учнів</span>
+                            </div>
+                            <div class="group-meta">Понеділок, середа • 18:00</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 78%;"></div>
+                            </div>
+                            <div class="progress-text">Підготовка до модуля 4</div>
+                        </article>
+
+                        <article class="group-card">
+                            <div class="group-card-header">
+                                <h4>Conversation B1</h4>
+                                <span class="group-badge">14 учнів</span>
+                            </div>
+                            <div class="group-meta">Вівторок, четвер • 19:30</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 61%;"></div>
+                            </div>
+                            <div class="progress-text">Перегляд теми "Work & Career"</div>
+                        </article>
+
+                        <article class="group-card">
+                            <div class="group-card-header">
+                                <h4>Business English</h4>
+                                <span class="group-badge">11 учнів</span>
+                            </div>
+                            <div class="group-meta">П'ятниця • 17:00</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 88%;"></div>
+                            </div>
+                            <div class="progress-text">Підготовка до презентацій</div>
+                        </article>
+
+                        <article class="group-card">
+                            <div class="group-card-header">
+                                <h4>Kids Club</h4>
+                                <span class="group-badge">22 учні</span>
+                            </div>
+                            <div class="group-meta">Субота • 10:00</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 52%;"></div>
+                            </div>
+                            <div class="progress-text">Повторення лексики</div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <h3>Сьогодні</h3>
+                    </div>
+
+                    <ul class="lesson-list">
+                        <li class="lesson-item">
+                            <div class="lesson-main">
+                                <span class="lesson-time">09:00</span>
+                                <div>
+                                    <div class="lesson-name">English Starter</div>
+                                    <div class="lesson-subtitle">Група A1 · 12 учнів</div>
+                                </div>
+                            </div>
+                            <span class="status-pill primary">Почати</span>
+                        </li>
+                         <li class="lesson-item">
+                            <div class="lesson-main">
+                                <span class="lesson-time">12:30</span>
+                                <div>
+                                    <div class="lesson-name">Speaking Lab</div>
+                                    <div class="lesson-subtitle">Група B1 · 8 учнів</div>
+                                </div>
+                            </div>
+                            <span class="status-pill success">Готується</span>
+                        </li>
+                         <li class="lesson-item">
+                            <div class="lesson-main">
+                                <span class="lesson-time">17:00</span>
+                                <div>
+                                    <div class="lesson-name">Business English</div>
+                                    <div class="lesson-subtitle">Модуль 5 · 11 учнів</div>
+                                </div>
+                            </div>
+                            <span class="status-pill primary">Заброньовано</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="teacher-two-column">
+                        <div>
+                            <div class="section-header">
+                                <h3>Останні відгуки</h3>
+                            </div>
+                            <ul class="feedback-list">
+                                <li class="feedback-item">
+                                    <div class="feedback-main">
+                                        <span class="lesson-time">⭐</span>
+                                        <div>
+                                            <div class="feedback-name">Анна К.</div>
+                                            <div class="feedback-text">Дякую за цікавий урок і підтримку.</div>
+                                        </div>
+                                    </div>
+                                    <div class="feedback-stars">★★★★★</div>
+                                </li>
+                                <li class="feedback-item">
+                                    <div class="feedback-main">
+                                        <span class="lesson-time">⭐</span>
+                                        <div>
+                                            <div class="feedback-name">Владислав М.</div>
+                                            <div class="feedback-text">Легко зрозумілий матеріал, дуже комфортно.</div>
+                                        </div>
+                                    </div>
+                                    <div class="feedback-stars">★★★★★</div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <div class="section-header">
+                                <h3>План на тиждень</h3>
+                            </div>
+                            <ul class="schedule-list">
+                                <li class="schedule-item"><span class="schedule-dot"></span><span>Підготувати домашнє завдання для Beginner A1</span></li>
+                                <li class="schedule-item"><span class="schedule-dot"></span><span>Перевірити тести Speaking Lab</span></li>
+                                <li class="schedule-item"><span class="schedule-dot"></span><span>Підписати нові підходи для Business English</span></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -365,6 +883,66 @@
     <script src="supabase-client.js?v=2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            const avatarInput = document.getElementById('avatarInput');
+            const avatarElement = document.getElementById('userAvatar');
+            const avatarStorageKey = 'lingoup-user-avatar';
+
+            const applyAvatar = (src, fallback) => {
+                if (src) {
+                    avatarElement.textContent = '';
+                    avatarElement.style.backgroundImage = `url("${src}")`;
+                    return;
+                }
+
+                avatarElement.style.backgroundImage = 'none';
+                avatarElement.textContent = fallback;
+            };
+
+            const renderStoredAvatar = (userType) => {
+                const fallback = userType === 'teacher' ? '👩‍🏫' : '👨‍🎓';
+                const savedAvatar = localStorage.getItem(avatarStorageKey);
+                applyAvatar(savedAvatar, fallback);
+            };
+
+            const renderRoleDashboard = (userType) => {
+                const isTeacher = userType === 'teacher';
+                const teacherDashboard = document.getElementById('teacherDashboard');
+                const studentDashboard = document.getElementById('studentDashboard');
+
+                renderStoredAvatar(userType);
+                document.getElementById('user-type').textContent = isTeacher ? 'Учитель' : 'Студент';
+                teacherDashboard.classList.toggle('hidden', !isTeacher);
+                studentDashboard.classList.toggle('hidden', isTeacher);
+            };
+
+            avatarInput.addEventListener('change', (event) => {
+                const [file] = event.target.files;
+                if (!file) {
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    alert('Виберіть зображення у форматі JPG, PNG або WebP.');
+                    avatarInput.value = '';
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Розмір фото не має перевищувати 2 МБ.');
+                    avatarInput.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const imageData = reader.result;
+                    localStorage.setItem(avatarStorageKey, imageData);
+                    applyAvatar(imageData, document.getElementById('user-type').textContent === 'Учитель' ? '👩‍🏫' : '👨‍🎓');
+                    avatarInput.value = '';
+                };
+                reader.readAsDataURL(file);
+            });
+
             try {
                 const user = await LingoUp.getCurrentUser();
                 if (!user) {
@@ -376,11 +954,16 @@
                 document.getElementById('user-name').textContent =
                     `${profile.name} ${profile.surname}${profile.is_admin ? ' (Адміністратор)' : ''}`;
                 document.getElementById('user-email').textContent = user.email;
-                document.getElementById('user-type').textContent =
-                    profile.user_type === 'teacher' ? 'Учитель' : 'Студент';
                 document.getElementById('profileUserType').value = profile.user_type;
+                renderRoleDashboard(profile.user_type);
                 if (profile.is_admin) {
-                    document.getElementById('admin-link').style.display = 'block';
+                    const adminLinks = [
+                        document.getElementById('admin-link'),
+                        document.getElementById('page-admin-link')
+                    ].filter(Boolean);
+                    adminLinks.forEach((adminLink) => {
+                        adminLink.style.display = 'list-item';
+                    });
                 }
                 document.getElementById('profileTypeForm').hidden = false;
             } catch (error) {
@@ -412,8 +995,7 @@
                         user.id,
                         document.getElementById('profileUserType').value
                     );
-                    document.getElementById('user-type').textContent =
-                        userType === 'teacher' ? 'Учитель' : 'Студент';
+                    renderRoleDashboard(userType);
                     status.textContent = 'Тип акаунта оновлено.';
                 } catch (error) {
                     status.textContent = error.message || 'Не вдалося оновити тип акаунта.';

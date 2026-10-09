@@ -36,6 +36,52 @@
             z-index: 100;
         }
 
+        .page-indicator {
+            position: absolute;
+            left: 50%;
+            top: 0.35rem;
+            transform: translateX(-50%);
+            max-width: 1200px;
+            width: calc(100% - 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .page-indicator-list {
+            list-style: none;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .page-indicator-list span {
+            display: inline-flex;
+            min-width: auto;
+            height: auto;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+        }
+
+        .page-indicator-list .active {
+            background: transparent;
+            color: var(--primary-green);
+        }
+
         .navbar {
             max-width: 1200px;
             margin: 0 auto;
@@ -67,13 +113,22 @@
 
         .nav-links a {
             text-decoration: none;
-            color: var(--text-dark);
+            color: var(--primary-blue);
             font-weight: 700;
             transition: color 0.3s;
         }
 
         .nav-links a:hover {
             color: var(--primary-green);
+        }
+
+        .nav-links a.active,
+        .nav-links a[aria-current="page"] {
+            color: var(--primary-green);
+        }
+
+        .nav-links a[href="admin.html"] {
+            color: #ef4444;
         }
 
         .btn-primary {
@@ -422,6 +477,106 @@
             }
         }
 
+        .reading-exercise {
+            max-width: 1200px;
+            margin: 5rem auto 0;
+            padding: 0 2rem;
+        }
+
+        .exercise-card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .exercise-tag {
+            display: inline-block;
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--primary-green);
+            font-weight: 800;
+            font-size: 0.8rem;
+        }
+
+        .reading-exercise h2 {
+            margin: 0;
+            color: var(--primary-blue);
+        }
+
+        .exercise-body {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .exercise-text {
+            padding: 1.25rem;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: var(--text-dark);
+            line-height: 1.8;
+        }
+
+        .question-block {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .question-block .question {
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .answer-options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.8rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .answer-option input {
+            accent-color: var(--primary-green);
+        }
+
+        .exercise-result {
+            min-height: 1.5rem;
+            font-weight: 700;
+        }
+
+        .exercise-result.success {
+            color: #15803d;
+        }
+
+        .exercise-result.error {
+            color: #b91c1c;
+        }
+
+        .btn-primary.small {
+            width: auto;
+            justify-self: start;
+        }
+
         .contacts {
             max-width: 1200px;
             margin: 5rem auto;
@@ -432,6 +587,13 @@
             margin-bottom: 1.5rem;
             color: var(--primary-blue);
             text-align: center;
+        }
+
+        .contacts-subtitle {
+            margin: 0 0 1.5rem;
+            color: #64748b;
+            text-align: center;
+            font-size: 1rem;
         }
 
         .contacts-list {
@@ -477,6 +639,27 @@
             margin-top: 4rem;
         }
 
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: 0;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);
+        }
+
+        .footer-btn.secondary {
+            background-color: #dbeafe;
+            color: var(--primary-blue);
+            box-shadow: none;
+        }
+
         footer p {
             opacity: 0.8;
         }
@@ -486,15 +669,25 @@
 
     <!-- Навігація -->
     <header>
+        <div class="page-indicator">
+            <ul class="page-indicator-list">
+                <li><span class="active">1.1</span></li>
+                <li><span>2.1</span></li>
+                <li><span>3.1</span></li>
+                <li><span>4.1</span></li>
+                <li id="page-admin-link" style="display: none;"><span>5.1</span></li>
+            </ul>
+        </div>
         <nav class="navbar">
             <a href="index.html" class="logo">Lingo<span>Up</span></a>
             <ul class="nav-links">
-                <li><a href="index.html">Головна</a></li>
-                <li id="admin-link" style="display: none;"><a href="admin.html" style="color: #ef4444;">Адмінпанель</a></li>
+                <li><a href="index.html" aria-current="page" class="active">Головна</a></li>
+                <li><a href="learning.html">Навчання</a></li>
                 <li><a href="index.html#contact">Контакти</a></li>
                 <li><a href="reviews.html">Відгуки</a></li>
+                <li id="admin-link" style="display: none;"><a href="admin.html">Адмінпанель</a></li>
             </ul>
-            <a href="register.html" class="btn-primary" id="auth-cta">Почати навчання</a>
+            <a href="profile.html" class="btn-primary" id="auth-cta">Кабінет</a>
         </nav>
     </header>
 
@@ -537,111 +730,112 @@
         <div class="hero-content">
             <h1>Твій шлях до вільної англійської</h1>
             <p>Вивчай англійську мову з LingoUp на будь-якому пристрої. Інтерактивні завдання, сучасна методика та постійна підтримка.</p>
-            <a href="register.html" class="btn-primary hero-action">Почати навчання</a>
         </div>
     </section>
 
-    <section id="contact" class="contacts" aria-labelledby="contactsTitle">
-        <h2 id="contactsTitle">Контакти</h2>
+    <section class="contacts" id="contact">
+        <h2>Контакти</h2>
+        <p class="contacts-subtitle">Основні контакти та способи зв’язку з командою LingoUp.</p>
         <p id="contactsStatus" role="status" aria-live="polite">Завантаження контактів...</p>
-        <div class="contacts-list" id="contactsList"></div>
+        <div id="contactsList" class="contacts-list"></div>
     </section>
-
-    <!-- Підвал -->
-    <footer>
-        <p>&copy; 2026 LingoUp - Вивчення англійської мови. Всі права захищені.</p>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-client.js?v=2"></script>
     <script>
-        function getContactHref(value) {
-            const normalized = value.trim();
-            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
-                return `mailto:${normalized}`;
+        function buildContactLink(value) {
+            const trimmed = String(value || '').trim();
+            if (!trimmed) {
+                return { href: '#', label: '—' };
             }
-            if (/^\+?[\d().\s-]{7,}$/.test(normalized)) {
-                return `tel:${normalized.replace(/[^\d+]/g, '')}`;
+            if (/^mailto:/i.test(trimmed)) {
+                return { href: trimmed, label: trimmed.replace(/^mailto:/i, '') };
             }
-
-            try {
-                const url = new URL(normalized.startsWith('www.') ? `https://${normalized}` : normalized);
-                return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
-            } catch {
-                return null;
+            if (/^tel:/i.test(trimmed)) {
+                return { href: trimmed, label: trimmed.replace(/^tel:/i, '') };
             }
+            if (/^https?:\/\//i.test(trimmed)) {
+                return { href: trimmed, label: trimmed };
+            }
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+                return { href: `mailto:${trimmed}`, label: trimmed };
+            }
+            if (/^\+?[0-9\s()\-]{7,}$/.test(trimmed)) {
+                return { href: `tel:${trimmed.replace(/[^+\d]/g, '')}`, label: trimmed };
+            }
+            return { href: trimmed, label: trimmed };
         }
 
-        function renderContacts(contacts) {
+        async function renderContacts() {
+            const status = document.getElementById('contactsStatus');
             const contactsList = document.getElementById('contactsList');
-            contactsList.replaceChildren();
+            if (!status || !contactsList) return;
 
-            contacts.forEach((contact) => {
-                const card = document.createElement('article');
-                card.className = 'contact-card';
+            status.classList.remove('error');
+            status.textContent = 'Завантаження контактів...';
+            contactsList.innerHTML = '';
 
-                const label = document.createElement('h3');
-                label.textContent = contact.label;
-
-                const value = document.createElement('p');
-                const href = getContactHref(contact.value);
-                if (href) {
-                    const link = document.createElement('a');
-                    link.href = href;
-                    link.textContent = contact.value;
-                    if (href.startsWith('http:') || href.startsWith('https:')) {
-                        link.target = '_blank';
-                        link.rel = 'noopener noreferrer';
-                    }
-                    value.appendChild(link);
-                } else {
-                    value.textContent = contact.value;
-                }
-
-                card.append(label, value);
-                contactsList.appendChild(card);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const contactsStatus = document.getElementById('contactsStatus');
             try {
                 const contacts = await LingoUp.getContacts();
-                renderContacts(contacts);
-                contactsStatus.classList.remove('error');
-                contactsStatus.textContent = contacts.length
-                    ? `Контактів: ${contacts.length}`
-                    : 'Адміністратор ще не додав контактів.';
-            } catch (error) {
-                contactsStatus.textContent = ['PGRST205', '42P01'].includes(error.code)
-                    ? 'Контакти ще не налаштовані. Адміністратору потрібно виконати актуальний supabase/schema.sql у Supabase SQL Editor.'
-                    : error.message || 'Не вдалося завантажити контакти.';
-                contactsStatus.classList.add('error');
-                console.error('Не вдалося завантажити контакти:', error);
-            }
-        });
+                if (!contacts || contacts.length === 0) {
+                    status.textContent = 'Контактів ще немає. Адміністратор може додати їх у панелі керування.';
+                    return;
+                }
 
-        // Перевірка, чи користувач є адміністратором
+                contacts.forEach((contact) => {
+                    const card = document.createElement('div');
+                    card.className = 'contact-card';
+
+                    const title = document.createElement('h3');
+                    title.textContent = contact.label || 'Контакт';
+
+                    const hrefInfo = buildContactLink(contact.value);
+                    const link = document.createElement('a');
+                    link.href = hrefInfo.href;
+                    link.textContent = hrefInfo.label;
+                    link.target = /^https?:\/\//i.test(hrefInfo.href) ? '_blank' : '_self';
+                    link.rel = 'noopener noreferrer';
+
+                    card.appendChild(title);
+                    card.appendChild(link);
+                    contactsList.appendChild(card);
+                });
+
+                status.textContent = 'Контакти успішно завантажено.';
+            } catch (error) {
+                status.textContent = error.message || 'Не вдалося завантажити контакти.';
+                status.classList.add('error');
+                console.error('Не вдалося завантажити контакти на головній сторінці:', error);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const user = await LingoUp.getCurrentUser();
-                if (user) {
-                    const authCta = document.getElementById('auth-cta');
+                const authCta = document.getElementById('auth-cta');
+                if (authCta) {
                     authCta.href = 'profile.html';
                     authCta.textContent = 'Кабінет';
-                    const heroAction = document.querySelector('.hero-action');
-                    heroAction.href = 'profile.html';
-                    heroAction.textContent = 'Кабінет';
+                }
 
+                const user = await LingoUp.getCurrentUser();
+                if (user) {
                     const profile = await LingoUp.getProfile(user.id);
                     if (profile.is_admin) {
-                        document.getElementById('admin-link').style.display = 'block';
+                        const adminLinks = [
+                            document.getElementById('admin-link'),
+                            document.getElementById('page-admin-link')
+                        ].filter(Boolean);
+                        adminLinks.forEach((adminLink) => {
+                            adminLink.style.display = 'list-item';
+                        });
                     }
                 }
             } catch (error) {
                 console.error('Не вдалося перевірити обліковий запис:', error);
             }
+
+            await renderContacts();
         });
     </script>
 </body>

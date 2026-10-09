@@ -73,6 +73,30 @@
             transition: border-color 0.3s;
         }
 
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin: 0.5rem 0 1rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .remember-row label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .remember-row input {
+            width: 1rem;
+            height: 1rem;
+            accent-color: var(--primary-green);
+        }
+
         .btn-primary {
             background-color: var(--primary-green);
             color: var(--white);
@@ -113,6 +137,13 @@
                 <label for="password">Пароль</label>
                 <input type="password" id="password" placeholder="Введіть пароль" required>
             </div>
+
+            <div class="remember-row">
+                <label for="rememberMe">
+                    <input type="checkbox" id="rememberMe">
+                    Зберігати пароль
+                </label>
+            </div>
             
             <button type="submit" class="btn-primary">Увійти</button>
         </form>
@@ -127,22 +158,52 @@
     <script src="supabase-config.js"></script>
     <script src="supabase-client.js?v=2"></script>
     <script>
+        const EMAIL_STORAGE_KEY = 'lingoup-login-email';
+        const PASSWORD_STORAGE_KEY = 'lingoup-login-password';
+        const REMEMBER_STORAGE_KEY = 'lingoup-login-remember';
+
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const rememberMeInput = document.getElementById('rememberMe');
+
+        const remembered = localStorage.getItem(REMEMBER_STORAGE_KEY) === 'true';
+        if (remembered) {
+            emailInput.value = localStorage.getItem(EMAIL_STORAGE_KEY) || '';
+            passwordInput.value = localStorage.getItem(PASSWORD_STORAGE_KEY) || '';
+            rememberMeInput.checked = true;
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.currentTarget;
             const button = form.querySelector('button[type="submit"]');
             const status = document.getElementById('authStatus');
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const shouldRemember = rememberMeInput.checked;
+
             button.disabled = true;
             status.textContent = 'Входимо...';
 
             try {
                 const { error } = await LingoUp.getClient().auth.signInWithPassword({
-                    email: document.getElementById('email').value.trim(),
-                    password: document.getElementById('password').value
+                    email,
+                    password
                 });
                 if (error) {
                     throw error;
                 }
+
+                if (shouldRemember) {
+                    localStorage.setItem(EMAIL_STORAGE_KEY, email);
+                    localStorage.setItem(PASSWORD_STORAGE_KEY, password);
+                    localStorage.setItem(REMEMBER_STORAGE_KEY, 'true');
+                } else {
+                    localStorage.removeItem(EMAIL_STORAGE_KEY);
+                    localStorage.removeItem(PASSWORD_STORAGE_KEY);
+                    localStorage.removeItem(REMEMBER_STORAGE_KEY);
+                }
+
                 window.location.href = 'profile.html';
             } catch (error) {
                 status.textContent = error.message || 'Не вдалося увійти.';

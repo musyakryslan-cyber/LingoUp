@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Читання - LingoUp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-green: #10b981;
+            --bg-light-blue: #e0f2fe;
+            --text-dark: #334155;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-indicator {
+            position: absolute;
+            left: 50%;
+            top: 0.35rem;
+            transform: translateX(-50%);
+            max-width: 1200px;
+            width: calc(100% - 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .page-indicator-list {
+            list-style: none;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .page-indicator-list span {
+            display: inline-flex;
+            min-width: auto;
+            height: auto;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+        }
+
+        .page-indicator-list .active {
+            color: var(--primary-green);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--primary-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .nav-links a.active {
+            color: var(--primary-green);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .page {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            margin-bottom: 1rem;
+        }
+
+        .upload-panel {
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, #eff6ff, #ecfdf5);
+            border: 1px solid #bfdbfe;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .upload-header h2 {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+        }
+
+        .upload-btn, .action-btn, .delete-btn, .speech-btn {
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.98rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 0.7rem 0.9rem;
+            min-width: 44px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            line-height: 1;
+            border-radius: 10px;
+        }
+
+        .speech-controls {
+            display: none;
+            margin-top: 1rem;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .speech-controls.visible {
+            display: flex;
+        }
+
+        .speech-btn {
+            background: linear-gradient(135deg, #f8fbff 0%, #e0f2fe 100%);
+            color: var(--primary-blue);
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 900;
+            border: 1px solid rgba(30, 58, 138, 0.12);
+            box-shadow: 0 8px 18px rgba(30, 58, 138, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .speech-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(30, 58, 138, 0.12);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+
+        .speech-btn:active {
+            transform: translateY(0);
+        }
+
+        .status-text {
+            margin-top: 0.85rem;
+            font-size: 0.92rem;
+            color: #475569;
+        }
+
+        .upload-btn {
+            background: var(--primary-green);
+            color: var(--white);
+            padding: 0.85rem 1.3rem;
+            box-shadow: 0 10px 18px rgba(16, 185, 129, 0.18);
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .document-viewer {
+            display: none;
+            margin-top: 1.25rem;
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 1.25rem;
+        }
+
+        .document-viewer.visible {
+            display: block;
+        }
+
+        .document-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .document-meta strong {
+            color: var(--primary-blue);
+        }
+
+        .document-tools {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            padding: 0.7rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upload-btn:hover, .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .document-content {
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            line-height: 1.8;
+            color: var(--text-dark);
+            white-space: normal;
+        }
+
+        .document-content p {
+            margin: 0 0 1rem;
+            white-space: pre-wrap;
+        }
+
+        .document-content img {
+            max-width: 100%;
+            margin: 1rem 0;
+            border-radius: 12px;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+        }
+
+        .document-translation {
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            border-radius: 14px;
+            color: #065f46;
+            display: none;
+            line-height: 1.8;
+        }
+
+        .document-translation.visible {
+            display: block;
+        }
+
+        .doc-preview-image {
+            max-width: 100%;
+            max-height: 520px;
+            border-radius: 14px;
+            border: 1px solid #dbeafe;
+            display: none;
+            margin-top: 1rem;
+            object-fit: contain;
+            background: #f8fafc;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        }
+
+        .doc-preview-image.visible {
+            display: block;
+        }
+
+        .pdf-preview {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            box-shadow: inset 0 0 0 1px rgba(30, 58, 138, 0.03);
+        }
+
+        .pdf-preview.visible {
+            display: block;
+        }
+
+        .pdf-preview canvas {
+            display: block;
+            max-width: 100%;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-indicator">
+            <ul class="page-indicator-list">
+                <li><span>1.1</span></li>
+                <li><span class="active">2.1</span></li>
+                <li><span>3.1</span></li>
+                <li><span>4.1</span></li>
+            </ul>
+        </div>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Lingo<span>Up</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="learning.html" class="active" aria-current="page">Навчання</a></li>
+                <li><a href="index.html#contact">Контакти</a></li>
+                <li><a href="reviews.html">Відгуки</a></li>
+            </ul>
+            <a href="profile.html" class="btn-primary">Кабінет</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="card">
+            <h1>Читання</h1>
+
+            <div class="upload-panel">
+                <div class="upload-header">
+                    <h2>Додати файл</h2>
+                    <div class="upload-actions">
+                        <input type="file" id="documentInput" class="hidden-input" accept="image/*,.txt,.pdf,.doc,.docx" />
+                        <button type="button" class="upload-btn" id="chooseFileBtn">Додати файл</button>
+                    </div>
+                </div>
+
+                <div id="documentViewer" class="document-viewer">
+                    <div class="document-meta">
+                        <strong id="documentName">Без назви</strong>
+                        <div class="document-tools">
+                            <button type="button" class="action-btn" id="readDocumentBtn"><span aria-hidden="true">🔊</span> Прочитати</button>
+                            <button type="button" class="action-btn" id="translateDocumentBtn"><span aria-hidden="true">🗣️</span> Перекласти</button>
+                            <button type="button" class="delete-btn" id="deleteFileBtn" aria-label="Видалити файл" title="Видалити файл">🗑️</button>
+                        </div>
+                    </div>
+
+                    <div id="speechControls" class="speech-controls" aria-live="polite">
+                        <button type="button" class="speech-btn" id="slowSpeechBtn" aria-label="Сповільнити вимову" title="Сповільнити">⏪</button>
+                        <button type="button" class="speech-btn" id="fastSpeechBtn" aria-label="Пришвидшити вимову" title="Пришвидшити">⏩</button>
+                        <button type="button" class="speech-btn" id="pauseSpeechBtn" aria-label="Пауза" title="Пауза">⏸</button>
+                    </div>
+
+                    <img id="documentImage" class="doc-preview-image" alt="Документ" />
+                    <div id="pdfPreview" class="pdf-preview"></div>
+                    <div id="documentContent" class="document-content"></div>
+                    <div id="documentStatus" class="status-text" aria-live="polite"></div>
+                    <div id="documentTranslation" class="document-translation"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script>
+        const STORAGE_KEY = 'lingoup-reading-current-file';
+        const fileInput = document.getElementById('documentInput');
+        const chooseFileBtn = document.getElementById('chooseFileBtn');
+        const deleteFileBtn = document.getElementById('deleteFileBtn');
+        const documentViewer = document.getElementById('documentViewer');
+        const documentName = document.getElementById('documentName');
+        const documentContent = document.getElementById('documentContent');
+        const documentTranslation = document.getElementById('documentTranslation');
+        const documentImage = document.getElementById('documentImage');
+        const pdfPreview = document.getElementById('pdfPreview');
+        const documentStatus = document.getElementById('documentStatus');
+        const readDocumentBtn = document.getElementById('readDocumentBtn');
+        const translateDocumentBtn = document.getElementById('translateDocumentBtn');
+        const speechControls = document.getElementById('speechControls');
+        const slowSpeechBtn = document.getElementById('slowSpeechBtn');
+        const fastSpeechBtn = document.getElementById('fastSpeechBtn');
+        const pauseSpeechBtn = document.getElementById('pauseSpeechBtn');
+
+        let currentText = '';
+        let activeSpeechUtterance = null;
+        let currentSpeechRate = 1;
+
+        function updatePauseButtonLabel() {
+            if (!('speechSynthesis' in window)) {
+                pauseSpeechBtn.textContent = '⏸';
+                return;
+            }
+
+            if (window.speechSynthesis.paused) {
+                pauseSpeechBtn.textContent = '▶';
+                pauseSpeechBtn.setAttribute('aria-label', 'Продовжити вимову');
+                pauseSpeechBtn.setAttribute('title', 'Продовжити');
+                return;
+            }
+
+            pauseSpeechBtn.textContent = '⏸';
+            pauseSpeechBtn.setAttribute('aria-label', 'Пауза');
+            pauseSpeechBtn.setAttribute('title', 'Пауза');
+        }
+
+        function saveStoredDocument(record) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+            } catch (error) {
+                console.warn('Не вдалося зберегти файл:', error);
+            }
+        }
+
+        function clearStoredDocument() {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+                console.warn('Не вдалося очистити збережений файл:', error);
+            }
+        }
+
+        function clearDocumentViewer() {
+            fileInput.value = '';
+            documentName.textContent = 'Без назви';
+            documentViewer.classList.remove('visible');
+            documentTranslation.classList.remove('visible');
+            documentTranslation.textContent = '';
+            documentContent.innerHTML = '';
+            documentImage.classList.remove('visible');
+            documentImage.src = '';
+            pdfPreview.classList.remove('visible');
+            pdfPreview.innerHTML = '';
+            documentStatus.textContent = 'Файл видалено.';
+            currentText = '';
+            currentSpeechRate = 1;
+            speechControls.classList.remove('visible');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            activeSpeechUtterance = null;
+            updatePauseButtonLabel();
+            clearStoredDocument();
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function normalizeText(value) {
+            return (value || '')
+                .replace(/\r\n/g, '\n')
+                .replace(/\r/g, '\n')
+                .replace(/\u00A0/g, ' ')
+                .replace(/[ \t]+/g, ' ')
+                .replace(/\n[ \t]+/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        function renderTextInViewer(value) {
+            const safeValue = normalizeText(value || '');
+            if (!safeValue) {
+                documentContent.innerHTML = '<p>Текст відсутній.</p>';
+                return;
+            }
+
+            const paragraphs = safeValue
+                .split(/\n{2,}/)
+                .map(block => block.trim())
+                .filter(Boolean)
+                .map(block => `<p>${escapeHtml(block).replace(/\n/g, '<br>')}</p>`)
+                .join('');
+
+            documentContent.innerHTML = paragraphs || '<p>Текст відсутній.</p>';
+        }
+
+        function renderHtmlInViewer(value) {
+            documentContent.innerHTML = value || '<p>Текст відсутній.</p>';
+        }
+
+        function simpleTranslate(text) {
+            return text
+                .replace(/\bI am\b/gi, 'Я є')
+                .replace(/\bThis\b/gi, 'Це')
+                .replace(/\bis\b/gi, 'є')
+                .replace(/\bMy\b/gi, 'Мій')
+                .replace(/\bname\b/gi, 'ім\'я')
+                .replace(/\bschool\b/gi, 'школа')
+                .replace(/\bEnglish\b/gi, 'англійська')
+                .replace(/\blearn\b/gi, 'вчити')
+                .replace(/\bread\b/gi, 'читати')
+                .replace(/\bwrite\b/gi, 'писати')
+                .replace(/\btoday\b/gi, 'сьогодні')
+                .replace(/\bhello\b/gi, 'привіт')
+                .replace(/\bfriend\b/gi, 'друг')
+                .replace(/\bwork\b/gi, 'робота')
+                .replace(/\bhome\b/gi, 'дім');
+        }
+
+        async function renderPdfPreviewFromDataUrl(dataUrl) {
+            try {
+                if (!dataUrl || typeof pdfjsLib === 'undefined') {
+                    return;
+                }
+
+                const loadingTask = pdfjsLib.getDocument({ data: atob(dataUrl.split(',')[1]) });
+                const pdf = await loadingTask.promise;
+                const firstPage = await pdf.getPage(1);
+                const viewport = firstPage.getViewport({ scale: 1.2 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await firstPage.render({ canvasContext: context, viewport }).promise;
+                pdfPreview.innerHTML = '';
+                pdfPreview.appendChild(canvas);
+                pdfPreview.classList.add('visible');
+            } catch (error) {
+                pdfPreview.classList.remove('visible');
+                pdfPreview.innerHTML = '';
+            }
+        }
+
+        function renderSavedDocument(record) {
+            if (!record) {
+                return;
+            }
+
+            documentName.textContent = record.name || 'Без назви';
+            documentViewer.classList.add('visible');
+            documentTranslation.classList.remove('visible');
+            currentText = record.text || '';
+            documentImage.classList.remove('visible');
+            documentImage.src = '';
+            pdfPreview.classList.remove('visible');
+            pdfPreview.innerHTML = '';
+
+            if (record.kind === 'image' && record.dataUrl) {
+                documentImage.src = record.dataUrl;
+                documentImage.classList.add('visible');
+                renderTextInViewer(record.text || 'Фото завантажено.');
+            } else if (record.kind === 'docx' && record.html) {
+                renderHtmlInViewer(record.html);
+            } else {
+                renderTextInViewer(record.text || 'Файл відкрито.');
+            }
+
+            if (record.kind === 'pdf' && record.dataUrl) {
+                renderPdfPreviewFromDataUrl(record.dataUrl);
+            }
+
+            documentStatus.textContent = 'Збережений файл відновлено.';
+            speechControls.classList.add('visible');
+            updatePauseButtonLabel();
+        }
+
+        async function readTextFromFile(file) {
+            const extension = (file.name || '').split('.').pop().toLowerCase();
+            const reader = new FileReader();
+            const dataUrl = await new Promise((resolve, reject) => {
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error || new Error('read error'));
+                reader.readAsDataURL(file);
+            });
+
+            if (file.type.startsWith('image/')) {
+                const record = {
+                    name: file.name,
+                    kind: 'image',
+                    type: file.type,
+                    dataUrl,
+                    text: 'Фото завантажено. Для озвучення та перекладу можна використовувати його текст, якщо він доступний.'
+                };
+                currentText = record.text;
+                documentImage.src = dataUrl;
+                documentImage.classList.add('visible');
+                pdfPreview.classList.remove('visible');
+                pdfPreview.innerHTML = '';
+                renderTextInViewer(record.text);
+                documentStatus.textContent = 'Фото успішно відкрито.';
+                saveStoredDocument(record);
+                return;
+            }
+
+            if (file.type === 'text/plain' || extension === 'txt') {
+                const text = normalizeText(await file.text());
+                const record = {
+                    name: file.name,
+                    kind: 'text',
+                    type: file.type,
+                    dataUrl,
+                    text
+                };
+                currentText = text;
+                renderTextInViewer(text);
+                documentImage.classList.remove('visible');
+                pdfPreview.classList.remove('visible');
+                pdfPreview.innerHTML = '';
+                documentStatus.textContent = 'Текстовий файл відкрито.';
+                saveStoredDocument(record);
+                return;
+            }
+
+            if (extension === 'pdf') {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let extracted = '';
+
+                for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+                    const page = await pdf.getPage(pageNumber);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    extracted += pageText + '\n';
+                }
+
+                const text = normalizeText(extracted);
+                const record = {
+                    name: file.name,
+                    kind: 'pdf',
+                    type: file.type,
+                    dataUrl,
+                    text
+                };
+                currentText = text;
+                renderTextInViewer(text || 'Текст у PDF не знайдено.');
+                documentImage.classList.remove('visible');
+                renderPdfPreviewFromDataUrl(dataUrl);
+                documentStatus.textContent = 'PDF відкрито і текст витягнуто.';
+                saveStoredDocument(record);
+                return;
+            }
+
+            if (extension === 'docx') {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                const htmlResult = await mammoth.convertToHtml({ arrayBuffer });
+                const text = normalizeText(result.value || '');
+                const record = {
+                    name: file.name,
+                    kind: 'docx',
+                    type: file.type,
+                    dataUrl,
+                    text,
+                    html: htmlResult.value || '<p>Текст у документі не знайдено.</p>'
+                };
+                currentText = text;
+                renderHtmlInViewer(record.html);
+                documentImage.classList.remove('visible');
+                pdfPreview.classList.remove('visible');
+                pdfPreview.innerHTML = '';
+                documentStatus.textContent = 'DOCX відкрито і текст витягнуто.';
+                saveStoredDocument(record);
+                return;
+            }
+
+            const fallbackText = 'Файл завантажено. Для читання та перекладу рекомендується використовувати текстовий файл, PDF або DOCX.';
+            const record = {
+                name: file.name,
+                kind: 'fallback',
+                type: file.type,
+                dataUrl,
+                text: fallbackText
+            };
+            currentText = fallbackText;
+            renderTextInViewer(fallbackText);
+            documentImage.classList.remove('visible');
+            pdfPreview.classList.remove('visible');
+            pdfPreview.innerHTML = '';
+            documentStatus.textContent = 'Формат файлу не розпізнано. Показано загальне повідомлення.';
+            saveStoredDocument(record);
+        }
+
+        chooseFileBtn.addEventListener('click', () => fileInput.click());
+        deleteFileBtn.addEventListener('click', clearDocumentViewer);
+
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            documentName.textContent = file.name;
+            documentViewer.classList.add('visible');
+            documentTranslation.classList.remove('visible');
+            documentContent.innerHTML = '<p>Завантаження...</p>';
+            documentImage.classList.remove('visible');
+            documentImage.src = '';
+            pdfPreview.classList.remove('visible');
+            pdfPreview.innerHTML = '';
+            documentStatus.textContent = '';
+            currentText = '';
+            speechControls.classList.remove('visible');
+            updatePauseButtonLabel();
+
+            await readTextFromFile(file);
+        });
+
+        function speakCurrentText(statusMessage = 'Озвучення запущено.') {
+            if (!currentText || !('speechSynthesis' in window)) {
+                if (!currentText) {
+                    documentStatus.textContent = 'Спочатку виберіть файл.';
+                } else {
+                    documentStatus.textContent = 'Озвучення недоступне в цьому браузері.';
+                }
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(currentText);
+            utterance.lang = 'uk-UA';
+            utterance.rate = currentSpeechRate;
+            activeSpeechUtterance = utterance;
+            speechControls.classList.add('visible');
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+            updatePauseButtonLabel();
+            documentStatus.textContent = statusMessage;
+        }
+
+        readDocumentBtn.addEventListener('click', () => {
+            speakCurrentText();
+        });
+
+        slowSpeechBtn.addEventListener('click', () => {
+            if (!('speechSynthesis' in window)) return;
+            currentSpeechRate = Math.max(0.5, currentSpeechRate - 0.2);
+            if (currentText) {
+                speakCurrentText('Швидкість вимови: ' + currentSpeechRate.toFixed(1) + 'x');
+            }
+        });
+
+        fastSpeechBtn.addEventListener('click', () => {
+            if (!('speechSynthesis' in window)) return;
+            currentSpeechRate = Math.min(2, currentSpeechRate + 0.2);
+            if (currentText) {
+                speakCurrentText('Швидкість вимови: ' + currentSpeechRate.toFixed(1) + 'x');
+            }
+        });
+
+        pauseSpeechBtn.addEventListener('click', () => {
+            if (!('speechSynthesis' in window)) return;
+
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+                updatePauseButtonLabel();
+                documentStatus.textContent = 'Вимову відновлено.';
+                return;
+            }
+
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.pause();
+                updatePauseButtonLabel();
+                documentStatus.textContent = 'Вимову поставлено на паузу.';
+                return;
+            }
+
+            if (currentText) {
+                speakCurrentText('Озвучення відновлено.');
+            }
+        });
+
+        translateDocumentBtn.addEventListener('click', () => {
+            if (!currentText) {
+                documentStatus.textContent = 'Спочатку виберіть файл.';
+                return;
+            }
+
+            const translatedText = simpleTranslate(currentText);
+            documentTranslation.textContent = 'Переклад: ' + translatedText;
+            documentTranslation.classList.add('visible');
+            documentStatus.textContent = 'Переклад показано.';
+        });
+
+        try {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+            if (saved && saved.name) {
+                renderSavedDocument(saved);
+            }
+        } catch (error) {
+            console.warn('Не вдалося відновити збережений файл:', error);
+        }
+    </script>
+</body>
+</html>

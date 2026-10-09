@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Словникові вправи - LingoUp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-green: #10b981;
+            --text-dark: #334155;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-indicator {
+            position: absolute;
+            left: 50%;
+            top: 0.35rem;
+            transform: translateX(-50%);
+            max-width: 1200px;
+            width: calc(100% - 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .page-indicator-list {
+            list-style: none;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .page-indicator-list span {
+            display: inline-flex;
+            min-width: auto;
+            height: auto;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+        }
+
+        .page-indicator-list .active {
+            color: var(--primary-green);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--primary-green);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .nav-links a.active {
+            color: var(--primary-green);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .page {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            margin-bottom: 1rem;
+        }
+
+        .question {
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .answers {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .answer-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.8rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .answer-item input {
+            accent-color: var(--primary-green);
+        }
+
+        .result {
+            min-height: 1.5rem;
+            margin-top: 1.2rem;
+            font-weight: 700;
+        }
+
+        .result.success {
+            color: #15803d;
+        }
+
+        .result.error {
+            color: #b91c1c;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .secondary-btn {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+            padding: 0.8rem 1.3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-indicator">
+            <ul class="page-indicator-list">
+                <li><span>1.1</span></li>
+                <li><span class="active">2.3</span></li>
+                <li><span>3.1</span></li>
+            </ul>
+        </div>
+        <nav class="navbar">
+            <a href="index.html" class="logo">Lingo<span>Up</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="learning.html" class="active">Навчання</a></li>
+                <li><a href="index.html#contact">Контакти</a></li>
+                <li><a href="reviews.html">Відгуки</a></li>
+            </ul>
+            <a href="profile.html" class="btn-primary">Кабінет</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <section class="card">
+            <h1>Словникові вправи</h1>
+
+            <div class="question">Що означає слово “friendly”?</div>
+            <div class="answers">
+                <label class="answer-item"><input type="radio" name="vocab-answer" value="a"> Дружній</label>
+                <label class="answer-item"><input type="radio" name="vocab-answer" value="b"> Сумний</label>
+                <label class="answer-item"><input type="radio" name="vocab-answer" value="c"> Швидкий</label>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn-primary" id="checkAnswer">Перевірити</button>
+                <a href="learning.html" class="secondary-btn">Назад до навчання</a>
+            </div>
+
+            <div id="result" class="result" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('checkAnswer').addEventListener('click', function () {
+            const selected = document.querySelector('input[name="vocab-answer"]:checked');
+            const result = document.getElementById('result');
+
+            if (!selected) {
+                result.textContent = 'Оберіть відповідь.';
+                result.className = 'result error';
+                return;
+            }
+
+            if (selected.value === 'a') {
+                result.textContent = 'Правильно! “Friendly” означає “дружній”.';
+                result.className = 'result success';
+            } else {
+                result.textContent = 'Ні, правильна відповідь: “дружній”.';
+                result.className = 'result error';
+            }
+        });
+    </script>
+</body>
+</html>

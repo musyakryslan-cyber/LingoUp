@@ -34,6 +34,52 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
+        .page-indicator {
+            position: absolute;
+            left: 50%;
+            top: 0.35rem;
+            transform: translateX(-50%);
+            max-width: 1200px;
+            width: calc(100% - 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .page-indicator-list {
+            list-style: none;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .page-indicator-list span {
+            display: inline-flex;
+            min-width: auto;
+            height: auto;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+        }
+
+        .page-indicator-list .active {
+            background: transparent;
+            color: var(--primary-green);
+        }
+
         .navbar {
             max-width: 1200px;
             margin: 0 auto;
@@ -65,12 +111,17 @@
         }
 
         .nav-links a {
-            color: var(--text-dark);
+            color: var(--primary-blue);
             font-weight: 700;
             text-decoration: none;
         }
 
         .nav-links a:hover {
+            color: var(--primary-green);
+        }
+
+        .nav-links a.active,
+        .nav-links a[aria-current="page"] {
             color: var(--primary-green);
         }
 
@@ -236,12 +287,23 @@
 </head>
 <body>
     <header>
+        <div class="page-indicator">
+            <ul class="page-indicator-list">
+                <li><span>1.1</span></li>
+                <li><span>2.1</span></li>
+                <li><span>3.1</span></li>
+                <li><span class="active">4.1</span></li>
+                <li id="page-admin-link" style="display: none;"><span>5.1</span></li>
+            </ul>
+        </div>
         <nav class="navbar">
             <a href="index.html" class="logo">Lingo<span>Up</span></a>
             <ul class="nav-links">
                 <li><a href="index.html">Головна</a></li>
+                <li><a href="learning.html">Навчання</a></li>
                 <li><a href="index.html#contact">Контакти</a></li>
-                <li><a href="reviews.html" aria-current="page">Відгуки</a></li>
+                <li><a href="reviews.html" aria-current="page" class="active">Відгуки</a></li>
+                <li id="admin-link" style="display: none;"><a href="admin.html">Адмінпанель</a></li>
             </ul>
             <a class="button" id="accountLink" href="login.html">Увійти</a>
         </nav>
@@ -340,6 +402,17 @@
                     reviewFormSection.hidden = false;
                     accountLink.href = 'profile.html';
                     accountLink.textContent = 'Кабінет';
+
+                    const profile = await LingoUp.getProfile(user.id);
+                    if (profile && profile.is_admin) {
+                        const adminLinks = [
+                            document.getElementById('admin-link'),
+                            document.getElementById('page-admin-link')
+                        ].filter(Boolean);
+                        adminLinks.forEach((adminLink) => {
+                            adminLink.style.display = 'list-item';
+                        });
+                    }
                 } else {
                     signInPrompt.hidden = false;
                 }
