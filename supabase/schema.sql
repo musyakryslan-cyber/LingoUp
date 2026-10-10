@@ -11,6 +11,8 @@ create table if not exists public.profiles (
 
 alter table public.profiles
     add column if not exists user_type text not null default 'student';
+alter table public.profiles
+    add column if not exists avatar_path text;
 
 alter table public.profiles
     drop constraint if exists profiles_user_type_check;
@@ -21,7 +23,7 @@ alter table public.profiles
 alter table public.profiles enable row level security;
 revoke all on table public.profiles from anon, authenticated;
 grant select on table public.profiles to authenticated;
-grant update (user_type) on table public.profiles to authenticated;
+grant update (user_type, avatar_path) on table public.profiles to authenticated;
 
 create or replace function public.is_lingoup_admin()
 returns boolean
@@ -56,6 +58,53 @@ create policy "Users can update their own profile type"
     to authenticated
     using ((select auth.uid()) = id)
     with check ((select auth.uid()) = id);
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+    'lingoup-avatars',
+    'lingoup-avatars',
+    true,
+    2097152,
+    array['image/jpeg', 'image/png', 'image/webp']
+)
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "Users can read their own avatars" on storage.objects;
+create policy "Users can read their own avatars"
+    on storage.objects
+    for select
+    to authenticated
+    using (
+        bucket_id = 'lingoup-avatars'
+        and (storage.foldername(name))[1] = (select auth.uid())::text
+    );
+
+drop policy if exists "Users can upload their own avatars" on storage.objects;
+create policy "Users can upload their own avatars"
+    on storage.objects
+    for insert
+    to authenticated
+    with check (
+        bucket_id = 'lingoup-avatars'
+        and (storage.foldername(name))[1] = (select auth.uid())::text
+    );
+
+drop policy if exists "Users can update their own avatars" on storage.objects;
+create policy "Users can update their own avatars"
+    on storage.objects
+    for update
+    to authenticated
+    using (
+        bucket_id = 'lingoup-avatars'
+        and (storage.foldername(name))[1] = (select auth.uid())::text
+    )
+    with check (
+        bucket_id = 'lingoup-avatars'
+        and (storage.foldername(name))[1] = (select auth.uid())::text
+    );
 
 create or replace function public.create_lingoup_profile()
 returns trigger

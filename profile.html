@@ -251,6 +251,15 @@
             color: #ef4444;
         }
 
+        #avatarStatus {
+            margin: 0.5rem 0 0;
+            font-size: 0.8rem;
+        }
+
+        #avatarStatus.error {
+            color: #ef4444;
+        }
+
         #profileLoadStatus {
             color: #ef4444;
         }
@@ -642,6 +651,7 @@
                     <span class="avatar-edit">Змінити фото</span>
                 </label>
                 <input id="avatarInput" type="file" accept="image/*" hidden>
+                <p id="avatarStatus" role="status" aria-live="polite"></p>
             </div>
             <h2 id="user-name">Студент</h2>
             <p id="user-email">student@example.com</p>
@@ -880,12 +890,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabase-client.js?v=2"></script>
+    <script src="supabase-client.js?v=4"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const avatarInput = document.getElementById('avatarInput');
             const avatarElement = document.getElementById('userAvatar');
-            const avatarStorageKey = 'lingoup-user-avatar';
+            const avatarStatus = document.getElementById('avatarStatus');
 
             const applyAvatar = (src, fallback) => {
                 if (src) {
@@ -900,8 +910,7 @@
 
             const renderStoredAvatar = (userType) => {
                 const fallback = userType === 'teacher' ? '👩‍🏫' : '👨‍🎓';
-                const savedAvatar = localStorage.getItem(avatarStorageKey);
-                applyAvatar(savedAvatar, fallback);
+                applyAvatar(null, fallback);
             };
 
             const renderRoleDashboard = (userType) => {
@@ -915,32 +924,32 @@
                 studentDashboard.classList.toggle('hidden', isTeacher);
             };
 
-            avatarInput.addEventListener('change', (event) => {
+            avatarInput.addEventListener('change', async (event) => {
                 const [file] = event.target.files;
                 if (!file) {
                     return;
                 }
 
-                if (!file.type.startsWith('image/')) {
-                    alert('Виберіть зображення у форматі JPG, PNG або WebP.');
+                avatarInput.disabled = true;
+                avatarStatus.classList.remove('error');
+                avatarStatus.textContent = 'Завантажуємо фото...';
+                try {
+                    const avatarUrl = await LingoUp.uploadAvatar(file);
+                    applyAvatar(avatarUrl, document.getElementById('user-type').textContent === 'Учитель' ? '👩‍🏫' : '👨‍🎓');
+                    avatarStatus.textContent = 'Фото збережено в профілі.';
+                    try {
+                        localStorage.removeItem('lingoup-user-avatar');
+                    } catch (error) {
+                        console.warn('Не вдалося видалити стару локальну копію аватара:', error);
+                    }
+                } catch (error) {
+                    avatarStatus.textContent = error.message || 'Не вдалося зберегти фото профілю.';
+                    avatarStatus.classList.add('error');
+                    console.error('Не вдалося синхронізувати аватар:', error);
+                } finally {
                     avatarInput.value = '';
-                    return;
+                    avatarInput.disabled = false;
                 }
-
-                if (file.size > 2 * 1024 * 1024) {
-                    alert('Розмір фото не має перевищувати 2 МБ.');
-                    avatarInput.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const imageData = reader.result;
-                    localStorage.setItem(avatarStorageKey, imageData);
-                    applyAvatar(imageData, document.getElementById('user-type').textContent === 'Учитель' ? '👩‍🏫' : '👨‍🎓');
-                    avatarInput.value = '';
-                };
-                reader.readAsDataURL(file);
             });
 
             try {
@@ -956,6 +965,16 @@
                 document.getElementById('user-email').textContent = user.email;
                 document.getElementById('profileUserType').value = profile.user_type;
                 renderRoleDashboard(profile.user_type);
+                try {
+                    const avatarUrl = await LingoUp.getAvatarUrl(profile.avatar_path);
+                    if (avatarUrl) {
+                        applyAvatar(avatarUrl, profile.user_type === 'teacher' ? '👩‍🏫' : '👨‍🎓');
+                    }
+                } catch (error) {
+                    avatarStatus.textContent = error.message || 'Не вдалося завантажити фото профілю.';
+                    avatarStatus.classList.add('error');
+                    console.error('Не вдалося завантажити аватар:', error);
+                }
                 if (profile.is_admin) {
                     const adminLinks = [
                         document.getElementById('admin-link'),

@@ -22,7 +22,7 @@
     async function getProfile(userId) {
         const { data, error } = await getClient()
             .from('profiles')
-            .select('name, surname, email, phone, user_type, is_admin')
+            .select('name, surname, email, phone, user_type, is_admin, avatar_path')
             .eq('id', userId)
             .single();
 
@@ -56,6 +56,53 @@
             throw error;
         }
         return data.user_type;
+    }
+
+    async function getAvatarUrl(path) {
+        if (!path) {
+            return null;
+        }
+
+        const { data } = getClient()
+            .storage
+            .from('lingoup-avatars')
+            .getPublicUrl(path);
+        return data.publicUrl;
+    }
+
+    async function uploadAvatar(file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!file || !allowedTypes.includes(file.type) || file.size > 2 * 1024 * 1024) {
+            throw new Error('Виберіть зображення JPG, PNG або WebP розміром до 2 МБ.');
+        }
+
+        const user = await getCurrentUser();
+        if (!user) {
+            throw new Error('Увійдіть, щоб зберегти фото профілю.');
+        }
+
+        const path = `${user.id}/avatar`;
+        const storage = getClient().storage.from('lingoup-avatars');
+        const { error: uploadError } = await storage.upload(path, file, {
+            cacheControl: '3600',
+            contentType: file.type,
+            upsert: true
+        });
+
+        if (uploadError) {
+            throw uploadError;
+        }
+
+        const { error: profileError } = await getClient()
+            .from('profiles')
+            .update({ avatar_path: path })
+            .eq('id', user.id);
+
+        if (profileError) {
+            throw profileError;
+        }
+
+        return getAvatarUrl(path);
     }
 
     async function getReviews() {
@@ -118,6 +165,8 @@
         getProfile,
         getCurrentUser,
         updateUserType,
+        getAvatarUrl,
+        uploadAvatar,
         getReviews,
         createReview,
         getContacts,
