@@ -105,6 +105,71 @@
         return getAvatarUrl(path);
     }
 
+    async function uploadReadingImage(file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!file || !allowedTypes.includes(file.type) || file.size > 10 * 1024 * 1024) {
+            throw new Error('Виберіть JPG, PNG, WebP або GIF розміром до 10 МБ.');
+        }
+
+        const user = await getCurrentUser();
+        if (!user) {
+            throw new Error('Увійдіть, щоб завантажити зображення на сервер.');
+        }
+
+        const extensions = {
+            'image/jpeg': 'jpg',
+            'image/png': 'png',
+            'image/webp': 'webp',
+            'image/gif': 'gif'
+        };
+        const path = `${user.id}/${crypto.randomUUID()}.${extensions[file.type]}`;
+        const storage = getClient().storage.from('lingoup-reading-images');
+        const { error } = await storage.upload(path, file, {
+            cacheControl: '3600',
+            contentType: file.type,
+            upsert: false
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        return { path, userId: user.id };
+    }
+
+    async function getReadingImageUrl(path) {
+        const user = await getCurrentUser();
+        if (!user || typeof path !== 'string' || !path.startsWith(`${user.id}/`)) {
+            throw new Error('Увійдіть в акаунт власника зображення, щоб переглянути його.');
+        }
+
+        const { data, error } = await getClient()
+            .storage
+            .from('lingoup-reading-images')
+            .createSignedUrl(path, 3600);
+
+        if (error) {
+            throw error;
+        }
+        return data.signedUrl;
+    }
+
+    async function deleteReadingImage(path) {
+        const user = await getCurrentUser();
+        if (!user || typeof path !== 'string' || !path.startsWith(`${user.id}/`)) {
+            throw new Error('Видалити зображення може лише його власник.');
+        }
+
+        const { error } = await getClient()
+            .storage
+            .from('lingoup-reading-images')
+            .remove([path]);
+
+        if (error) {
+            throw error;
+        }
+    }
+
     async function getReviews() {
         const { data, error } = await getClient()
             .from('reviews')
@@ -167,6 +232,9 @@
         updateUserType,
         getAvatarUrl,
         uploadAvatar,
+        uploadReadingImage,
+        getReadingImageUrl,
+        deleteReadingImage,
         getReviews,
         createReview,
         getContacts,
