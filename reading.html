@@ -175,6 +175,51 @@
             font-size: 0.92rem;
         }
 
+        .saved-image-library {
+            display: none;
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            background: #f8fbff;
+        }
+
+        .saved-image-library.visible {
+            display: block;
+        }
+
+        .saved-image-library h3 {
+            margin-bottom: 0.65rem;
+            color: var(--primary-blue);
+            font-size: 1rem;
+        }
+
+        .saved-image-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .saved-image-item {
+            max-width: 100%;
+            padding: 0.55rem 0.8rem;
+            overflow-wrap: anywhere;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--primary-blue);
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .saved-image-item:hover,
+        .saved-image-item[aria-pressed="true"] {
+            border-color: var(--primary-blue);
+            background: #eff6ff;
+        }
+
         .upload-btn, .action-btn, .delete-btn, .speech-btn {
             border: none;
             border-radius: 12px;
@@ -225,6 +270,15 @@
 
         .speech-controls.visible {
             display: flex;
+        }
+
+        .speech-rate-indicator {
+            min-width: 3.8rem;
+            color: var(--primary-blue);
+            font-size: 0.95rem;
+            font-weight: 900;
+            text-align: center;
+            white-space: nowrap;
         }
 
         .speech-btn {
@@ -678,7 +732,11 @@
                         <button type="button" class="upload-btn" id="chooseFileBtn">Додати файл</button>
                     </div>
                 </div>
-                <p class="upload-note">Зображення зберігається на сервері у вашому акаунті й доступне на інших пристроях після входу в той самий акаунт. Щоб завантажити або видалити його, увійдіть в акаунт. Текст розпізнається англійською й українською у браузері; під час озвучення слово підсвічується на зображенні без контуру. Для перекладу вибраний текст надсилається сервісу MyMemory.</p>
+                <p class="upload-note">Усі завантажені зображення зберігаються на сервері у вашому акаунті, доки ви їх не видалите, і доступні на інших пристроях після входу в той самий акаунт. Щоб завантажити або видалити їх, увійдіть в акаунт. Текст розпізнається англійською й українською у браузері; під час озвучення слово підсвічується на зображенні без контуру. Для перекладу вибраний текст надсилається сервісу MyMemory.</p>
+                <div id="savedImageLibrary" class="saved-image-library" aria-live="polite">
+                    <h3>Збережені зображення</h3>
+                    <div id="savedImageList" class="saved-image-list"></div>
+                </div>
 
                 <div id="documentViewer" class="document-viewer">
                     <div class="document-meta">
@@ -693,6 +751,7 @@
                             </div>
                             <div class="document-playback-row">
                                 <div id="speechControls" class="speech-controls" aria-live="polite">
+                                    <span id="speechRateIndicator" class="speech-rate-indicator" aria-live="polite">×1</span>
                                     <button type="button" class="speech-btn" id="slowSpeechBtn" aria-label="Сповільнити вимову" title="Сповільнити">⏪</button>
                                     <button type="button" class="speech-btn" id="fastSpeechBtn" aria-label="Пришвидшити вимову" title="Пришвидшити">⏩</button>
                                     <button type="button" class="speech-btn" id="pauseSpeechBtn" aria-label="Пауза" title="Пауза">⏸</button>
@@ -730,12 +789,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabase-client.js?v=6"></script>
+    <script src="supabase-client.js?v=7"></script>
     <script>
         const STORAGE_KEY = 'lingoup-reading-current-file';
         const fileInput = document.getElementById('documentInput');
         const chooseFileBtn = document.getElementById('chooseFileBtn');
         const deleteFileBtn = document.getElementById('deleteFileBtn');
+        const savedImageLibrary = document.getElementById('savedImageLibrary');
+        const savedImageList = document.getElementById('savedImageList');
         const documentViewer = document.getElementById('documentViewer');
         const documentName = document.getElementById('documentName');
         const documentContent = document.getElementById('documentContent');
@@ -761,6 +822,7 @@
         const speechControls = document.getElementById('speechControls');
         const slowSpeechBtn = document.getElementById('slowSpeechBtn');
         const fastSpeechBtn = document.getElementById('fastSpeechBtn');
+        const speechRateIndicator = document.getElementById('speechRateIndicator');
         const pauseSpeechBtn = document.getElementById('pauseSpeechBtn');
 
         let currentText = '';
@@ -1008,9 +1070,13 @@
                     await LingoUp.deleteReadingImage(record.storagePath);
                 }
                 clearDocumentViewer();
+                const remainingImages = await refreshReadingImageLibrary();
+                if (remainingImages.length > 0) {
+                    await openSavedReadingImage(remainingImages[0]);
+                }
             } catch (error) {
                 console.error('Не вдалося видалити файл:', error);
-                documentStatus.textContent = error.message || 'Не вдалося видалити зображення із сервера.';
+                documentStatus.textContent = error.message || 'Не вдалося видалити зображення або оновити список.';
             } finally {
                 setFileProcessing(false);
             }
@@ -1484,6 +1550,67 @@
             updatePauseButtonLabel();
         }
 
+        async function refreshReadingImageLibrary() {
+            const images = await LingoUp.listReadingImages();
+            savedImageList.replaceChildren();
+            savedImageLibrary.classList.toggle('visible', images.length > 0);
+
+            for (const image of images) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'saved-image-item';
+                button.dataset.storagePath = image.path;
+                button.textContent = image.name;
+                button.setAttribute('aria-pressed', String(currentDocumentRecord?.storagePath === image.path));
+                if (image.createdAt) {
+                    button.title = `Завантажено: ${new Date(image.createdAt).toLocaleString('uk-UA')}`;
+                }
+                savedImageList.appendChild(button);
+            }
+
+            return images;
+        }
+
+        async function openSavedReadingImage(image) {
+            const record = {
+                name: image.name,
+                kind: 'image',
+                type: '',
+                storagePath: image.path,
+                ownerId: image.userId,
+                text: '',
+                imageWords: [],
+                ocrProcessed: false
+            };
+            saveStoredDocument(record);
+            await renderSavedDocument(record);
+            await refreshReadingImageLibrary();
+        }
+
+        savedImageList.addEventListener('click', async (event) => {
+            const button = event.target instanceof Element
+                ? event.target.closest('.saved-image-item')
+                : null;
+            if (!button?.dataset.storagePath) {
+                return;
+            }
+
+            button.disabled = true;
+            try {
+                const images = await LingoUp.listReadingImages();
+                const image = images.find((item) => item.path === button.dataset.storagePath);
+                if (!image) {
+                    throw new Error('Це зображення більше не збережене на сервері.');
+                }
+                await openSavedReadingImage(image);
+            } catch (error) {
+                console.error('Не вдалося відкрити збережене зображення:', error);
+                documentStatus.textContent = error.message || 'Не вдалося відкрити збережене зображення.';
+            } finally {
+                button.disabled = false;
+            }
+        });
+
         async function readTextFromFile(file) {
             const extension = (file.name || '').split('.').pop().toLowerCase();
             if (file.type.startsWith('image/')) {
@@ -1499,6 +1626,7 @@
                     ocrProcessed: false
                 };
                 saveStoredDocument(record);
+                await refreshReadingImageLibrary();
                 showDocumentImage(await LingoUp.getReadingImageUrl(record.storagePath));
                 pdfPreview.classList.remove('visible');
                 pdfPreview.innerHTML = '';
@@ -1742,6 +1870,31 @@
             });
         }
 
+        function formatSpeechMultiplier(rate) {
+            return rate.toLocaleString('uk-UA', {
+                maximumFractionDigits: 2
+            });
+        }
+
+        function updateSpeechRateIndicator() {
+            if (currentSpeechRate < 1) {
+                const factor = formatSpeechMultiplier(1 / currentSpeechRate);
+                speechRateIndicator.textContent = `−x${factor}`;
+                speechRateIndicator.setAttribute('aria-label', `У ${factor} раза повільніше`);
+                return;
+            }
+
+            if (currentSpeechRate > 1) {
+                const factor = formatSpeechMultiplier(currentSpeechRate);
+                speechRateIndicator.textContent = `+x${factor}`;
+                speechRateIndicator.setAttribute('aria-label', `У ${factor} раза швидше`);
+                return;
+            }
+
+            speechRateIndicator.textContent = '×1';
+            speechRateIndicator.setAttribute('aria-label', 'Звичайна швидкість');
+        }
+
         function formatTimesWord(factor) {
             if (factor % 1 !== 0) {
                 return 'раза';
@@ -1974,6 +2127,7 @@
 
         slowSpeechBtn.addEventListener('click', () => {
             currentSpeechRate = Math.max(0.5, currentSpeechRate - 0.2);
+            updateSpeechRateIndicator();
             const slowdownFactor = 1 / currentSpeechRate;
             const statusMessage = `Швидкість: ${formatSpeechRate(currentSpeechRate)}× від звичайної — у ${formatSpeechRate(slowdownFactor)} ${formatTimesWord(slowdownFactor)} повільніше.`;
             if (currentText) {
@@ -1989,6 +2143,7 @@
 
         fastSpeechBtn.addEventListener('click', () => {
             currentSpeechRate = Math.min(2, currentSpeechRate + 0.2);
+            updateSpeechRateIndicator();
             const statusMessage = `Швидкість: ${formatSpeechRate(currentSpeechRate)}× від звичайної — у ${formatSpeechRate(currentSpeechRate)} ${formatTimesWord(currentSpeechRate)} швидше.`;
             if (currentText) {
                 if ('speechSynthesis' in window) {
@@ -2056,6 +2211,8 @@
                 throw new Error('Не вдалося відновити збережений файл із цього браузера.');
             }
 
+            const images = await refreshReadingImageLibrary();
+
             if (saved?.name) {
                 await renderSavedDocument(saved);
             }
@@ -2064,27 +2221,15 @@
                 return;
             }
 
-            const latestImage = await LingoUp.getLatestReadingImage();
-            if (!latestImage) {
+            if (saved?.storagePath && images.some((image) => image.path === saved.storagePath)) {
                 return;
             }
 
-            if (saved?.storagePath === latestImage.path) {
+            if (images.length === 0) {
                 return;
             }
 
-            const record = {
-                name: latestImage.name,
-                kind: 'image',
-                type: '',
-                storagePath: latestImage.path,
-                ownerId: latestImage.userId,
-                text: '',
-                imageWords: [],
-                ocrProcessed: false
-            };
-            saveStoredDocument(record);
-            await renderSavedDocument(record);
+            await openSavedReadingImage(images[0]);
         }
 
         restoreReadingDocument().catch((error) => {

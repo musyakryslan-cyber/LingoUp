@@ -154,34 +154,41 @@
         return data.signedUrl;
     }
 
-    async function getLatestReadingImage() {
+    async function listReadingImages() {
         const user = await getCurrentUser();
         if (!user) {
-            return null;
+            return [];
         }
 
-        const { data, error } = await getClient()
-            .storage
-            .from('lingoup-reading-images')
-            .list(user.id, {
-                limit: 1,
+        const storage = getClient().storage.from('lingoup-reading-images');
+        const images = [];
+        const pageSize = 100;
+
+        for (let offset = 0; ; offset += pageSize) {
+            const { data, error } = await storage.list(user.id, {
+                limit: pageSize,
+                offset,
                 sortBy: { column: 'created_at', order: 'desc' }
             });
 
-        if (error) {
-            throw error;
-        }
+            if (error) {
+                throw error;
+            }
 
-        const image = data?.find((item) => item.id && item.name);
-        if (!image) {
-            return null;
-        }
+            const pageImages = (data || [])
+                .filter((item) => item.id && item.name)
+                .map((item) => ({
+                    path: `${user.id}/${item.name}`,
+                    userId: user.id,
+                    name: item.name,
+                    createdAt: item.created_at || null
+                }));
+            images.push(...pageImages);
 
-        return {
-            path: `${user.id}/${image.name}`,
-            userId: user.id,
-            name: image.name
-        };
+            if (!data || data.length < pageSize) {
+                return images;
+            }
+        }
     }
 
     async function deleteReadingImage(path) {
@@ -264,7 +271,7 @@
         uploadAvatar,
         uploadReadingImage,
         getReadingImageUrl,
-        getLatestReadingImage,
+        listReadingImages,
         deleteReadingImage,
         getReviews,
         createReview,
