@@ -147,32 +147,128 @@
         }
 
         .upload-panel {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             background: linear-gradient(135deg, #eff6ff, #ecfdf5);
             border: 1px solid #bfdbfe;
-            border-radius: 24px;
-            padding: 1.5rem;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+            border-radius: 20px;
+            padding: 1rem 1.1rem;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .upload-panel:not(.open) {
+            width: 307px;
+            height: 117px;
+            overflow: hidden;
+        }
+
+        .upload-panel:not(.open) > :not(.upload-header) {
+            display: none;
+        }
+
+        .upload-panel:not(.open) .upload-header {
+            margin-bottom: 0;
+            gap: 0.4rem;
+        }
+
+        .upload-header .upload-btn,
+        .document-meta .upload-btn {
+            padding: 0.4rem 0.65rem;
+            font-size: 0.75rem;
+            border-radius: 8px;
+            box-shadow: none;
+        }
+
+        .upload-header .panel-toggle {
+            padding: 0.4rem 0;
+            width: 28px;
+            font-size: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .mini-book {
+            flex-basis: 100%;
+            display: none;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .mini-book.visible {
+            display: flex;
+        }
+
+        .mini-book-cover {
+            width: 38px;
+            height: 50px;
+            flex: none;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+            background: #dbeafe;
+            overflow: hidden;
+            padding: 0;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .mini-book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .mini-book-title {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .panel-toggle {
+            border: none;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border-radius: 10px;
+            width: 40px;
+            padding: 0.7rem 0;
+            font-weight: 900;
+            cursor: pointer;
+            margin-left: 0.4rem;
+            transition: transform 0.2s ease;
+        }
+
+        .upload-panel.open .panel-toggle {
+            transform: rotate(180deg);
+        }
+
+        .upload-actions {
+            display: flex;
+            align-items: center;
         }
 
         .upload-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .upload-header h2 {
             color: var(--primary-blue);
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            line-height: 1.3;
         }
 
         .upload-note {
-            margin: 0.25rem 0 1rem;
+            margin: 0.2rem 0 0.75rem;
             color: #475569;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
         }
 
         .reading-admin-info {
@@ -268,7 +364,7 @@
             border-radius: 10px;
         }
 
-        .document-meta .delete-btn {
+        .document-name-actions .delete-btn {
             width: 22px;
             height: 22px;
             min-width: 22px;
@@ -282,8 +378,8 @@
 
         .speech-controls {
             display: none;
-            margin-top: 1rem;
-            gap: 0.7rem;
+            margin-top: 0.45rem;
+            gap: 0.45rem;
             flex-wrap: wrap;
             align-items: center;
         }
@@ -293,9 +389,9 @@
         }
 
         .speech-rate-indicator {
-            min-width: 3.8rem;
+            min-width: 2.8rem;
             color: var(--primary-blue);
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             font-weight: 900;
             text-align: center;
             white-space: nowrap;
@@ -304,23 +400,23 @@
         .speech-btn {
             background: linear-gradient(135deg, #f8fbff 0%, #e0f2fe 100%);
             color: var(--primary-blue);
-            width: 42px;
-            height: 42px;
+            width: 34px;
+            height: 34px;
             padding: 0;
-            border-radius: 12px;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 900;
             border: 1px solid rgba(30, 58, 138, 0.12);
-            box-shadow: 0 8px 18px rgba(30, 58, 138, 0.08);
+            box-shadow: 0 6px 14px rgba(30, 58, 138, 0.08);
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
 
         .speech-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 10px 22px rgba(30, 58, 138, 0.12);
+            box-shadow: 0 8px 18px rgba(30, 58, 138, 0.12);
             background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
         }
 
@@ -358,17 +454,124 @@
             display: block;
         }
 
+        .upload-panel.open .document-viewer:not(.visible) {
+            display: block;
+            margin: 0;
+            padding: 0;
+            background: none;
+            border: 0;
+        }
+
+        .upload-panel.open .document-viewer:not(.visible) > :not(.document-meta),
+        .upload-panel.open .document-viewer:not(.visible) .book-cover-panel {
+            display: none;
+        }
+
+        .upload-panel.open .document-viewer:not(.visible) .document-meta {
+            margin-bottom: 0;
+        }
+
+        .upload-panel:not(.open) > :not(.upload-header) {
+            display: none;
+        }
+
         .document-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .document-meta strong {
             color: var(--primary-blue);
+            font-size: 0.95rem;
+        }
+
+        .book-cover-panel {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            padding: 0.6rem 0.7rem;
+            background: linear-gradient(135deg, #eff6ff 0%, #ecfdf5 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            margin-bottom: 0.75rem;
+        }
+
+        .book-cover-preview {
+            width: 72px;
+            height: 96px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: linear-gradient(160deg, #1e3a8a, #10b981);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.12);
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            overflow: hidden;
+            position: relative;
+            display: grid;
+            place-items: center;
+            color: var(--white);
+        }
+
+        .book-cover-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .book-cover-placeholder {
+            display: grid;
+            place-items: center;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 800;
+            font-size: 0.67rem;
+            line-height: 1.3;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .book-cover-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            align-items: center;
+        }
+
+        .book-cover-btn {
+            border: none;
+            border-radius: 9px;
+            padding: 0.5rem 0.7rem;
+            background: var(--primary-blue);
+            color: var(--white);
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            font-size: 0.72rem;
+        }
+
+        .book-cover-btn.secondary {
+            background: #e2e8f0;
+            color: var(--text-dark);
+        }
+
+        .document-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem 0.9rem;
+            flex-wrap: wrap;
+            padding: 0.5rem 0.7rem;
+            margin-bottom: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
         }
 
         .document-name-actions {
@@ -376,19 +579,30 @@
             align-items: center;
             gap: 0.5rem;
             min-width: 0;
+            flex: 1 1 160px;
+        }
+
+        .document-name-actions strong {
+            color: var(--primary-blue);
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .document-controls {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
             gap: 0.5rem;
         }
 
         .document-tools {
             display: flex;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
         }
 
@@ -405,10 +619,12 @@
         .action-btn {
             background: #eff6ff;
             color: var(--primary-blue);
-            padding: 0.7rem 1rem;
+            padding: 0.5rem 0.8rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
         }
 
         .upload-btn:hover, .action-btn:hover {
@@ -746,11 +962,14 @@
 
             <div class="upload-panel">
                 <div class="upload-header">
-                    <h2>Додати файл</h2>
                     <div class="upload-actions">
                         <input type="file" id="documentInput" class="hidden-input" accept="image/*,.txt,.pdf,.doc,.docx" />
-                        <button type="button" class="upload-btn" id="chooseFileBtn">Додати файл</button>
+                        <button type="button" class="panel-toggle" id="panelToggleBtn" aria-expanded="false" aria-label="Розгорнути блок" title="Розгорнути">▾</button>
                     </div>
+                                            <div class="mini-book" id="miniBook">
+                                                <button type="button" class="mini-book-cover" id="miniBookCover" aria-label="Змінити заставку" title="Змінити заставку"><span id="miniBookCoverIcon">📖</span><img id="miniBookCoverImage" alt="Заставка" hidden></button>
+                                                <input type="text" class="mini-book-title" id="bookTitleInput" maxlength="120" placeholder="Назва книги" aria-label="Назва книги">
+                                            </div>
                 </div>
                 <details id="readingAdminInfo" class="reading-admin-info" hidden>
                     <summary>Адміністративна інформація</summary>
@@ -763,6 +982,21 @@
 
                 <div id="documentViewer" class="document-viewer">
                     <div class="document-meta">
+                        <button type="button" class="upload-btn" id="chooseFileBtn">Додати файл</button>
+                        <div class="book-cover-panel">
+                            <div class="book-cover-preview" id="bookCoverPreview">
+                                <img id="bookCoverImage" alt="Заставка книги" hidden>
+                                <div id="bookCoverPlaceholder" class="book-cover-placeholder">Книга</div>
+                            </div>
+                            <div class="book-cover-actions">
+                                <input type="file" id="coverInput" class="hidden-input" accept="image/*">
+                                <button type="button" class="book-cover-btn" id="chooseCoverBtn">Додати заставку</button>
+                                <button type="button" class="book-cover-btn secondary" id="removeCoverBtn">Видалити</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="document-toolbar">
                         <div class="document-name-actions">
                             <strong id="documentName">Без назви</strong>
                             <button type="button" class="delete-btn" id="deleteFileBtn" aria-label="Видалити файл" title="Видалити файл">🗑️</button>
@@ -848,6 +1082,11 @@
         const fastSpeechBtn = document.getElementById('fastSpeechBtn');
         const speechRateIndicator = document.getElementById('speechRateIndicator');
         const pauseSpeechBtn = document.getElementById('pauseSpeechBtn');
+        const coverInput = document.getElementById('coverInput');
+        const chooseCoverBtn = document.getElementById('chooseCoverBtn');
+        const removeCoverBtn = document.getElementById('removeCoverBtn');
+        const bookCoverImage = document.getElementById('bookCoverImage');
+        const bookCoverPlaceholder = document.getElementById('bookCoverPlaceholder');
 
         let currentText = '';
         let activeSpeechUtterance = null;
@@ -869,6 +1108,24 @@
         let textSelectionStart = null;
         let textSelectionEnd = null;
         let suppressNextWordClick = false;
+
+        const uploadPanel = document.querySelector('.upload-panel');
+        const panelToggleBtn = document.getElementById('panelToggleBtn');
+
+        function setPanelOpen(isOpen) {
+            uploadPanel.classList.toggle('open', isOpen);
+            panelToggleBtn.setAttribute('aria-expanded', String(isOpen));
+        }
+
+        panelToggleBtn.addEventListener('click', () => setPanelOpen(!uploadPanel.classList.contains('open')));
+        new MutationObserver(() => {
+            if (documentViewer.classList.contains('visible')) {
+                setPanelOpen(true);
+            }
+        }).observe(documentViewer, { attributes: true, attributeFilter: ['class'] });
+        if (documentViewer.classList.contains('visible')) {
+            setPanelOpen(true);
+        }
 
         function setFileProcessing(isProcessing) {
             chooseFileBtn.disabled = isProcessing;
@@ -950,6 +1207,54 @@
             pauseSpeechBtn.setAttribute('title', 'Пауза');
         }
 
+        function renderMiniBook(record) {
+            const miniBook = document.getElementById('miniBook');
+            const miniImage = document.getElementById('miniBookCoverImage');
+            const miniIcon = document.getElementById('miniBookCoverIcon');
+            const titleInput = document.getElementById('bookTitleInput');
+            miniBook.classList.toggle('visible', Boolean(record));
+            if (!record) {
+                return;
+            }
+            if (document.activeElement !== titleInput) {
+                titleInput.value = record.name || '';
+            }
+            if (record.coverDataUrl) {
+                miniImage.src = record.coverDataUrl;
+                miniImage.hidden = false;
+                miniIcon.hidden = true;
+            } else {
+                miniImage.hidden = true;
+                miniImage.removeAttribute('src');
+                miniIcon.hidden = false;
+            }
+        }
+
+        function renderBookCover(record = currentDocumentRecord) {
+            renderMiniBook(record);
+            if (!record) {
+                bookCoverImage.hidden = true;
+                bookCoverImage.removeAttribute('src');
+                bookCoverPlaceholder.hidden = false;
+                return;
+            }
+
+            const coverUrl = record.coverDataUrl || '';
+            const titleText = record.name || 'Книга';
+            bookCoverPlaceholder.textContent = titleText.length > 18 ? `${titleText.slice(0, 18)}…` : titleText;
+
+            if (coverUrl) {
+                bookCoverImage.src = coverUrl;
+                bookCoverImage.hidden = false;
+                bookCoverPlaceholder.hidden = true;
+                return;
+            }
+
+            bookCoverImage.hidden = true;
+            bookCoverImage.removeAttribute('src');
+            bookCoverPlaceholder.hidden = false;
+        }
+
         function saveStoredDocument(record) {
             currentDocumentRecord = record;
             try {
@@ -959,6 +1264,7 @@
                     delete storedRecord.signedUrl;
                 }
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(storedRecord));
+                renderBookCover(storedRecord);
             } catch (error) {
                 console.error('Не вдалося зберегти файл:', error);
             }
@@ -1072,6 +1378,7 @@
             pdfPreview.classList.remove('visible');
             pdfPreview.innerHTML = '';
             documentStatus.textContent = 'Файл видалено.';
+            renderBookCover(null);
             currentText = '';
             currentSpeechRate = 1;
             readingResumeOffset = null;
@@ -1516,6 +1823,7 @@
             currentDocumentRecord = record;
             documentViewer.classList.toggle('image-document', record.kind === 'image');
             documentName.textContent = record.name || 'Без назви';
+            renderBookCover(record);
             documentViewer.classList.add('visible');
             documentTranslation.classList.remove('visible');
             currentText = record.text || '';
@@ -1784,7 +2092,51 @@
         }
 
         chooseFileBtn.addEventListener('click', () => fileInput.click());
+        chooseCoverBtn.addEventListener('click', () => coverInput.click());
+        document.getElementById('miniBookCover').addEventListener('click', () => coverInput.click());
+        document.getElementById('bookTitleInput').addEventListener('change', (event) => {
+            if (!currentDocumentRecord) {
+                return;
+            }
+
+            const title = event.target.value.trim() || currentDocumentRecord.name || 'Без назви';
+            currentDocumentRecord.name = title;
+            event.target.value = title;
+            documentName.textContent = title;
+            saveStoredDocument(currentDocumentRecord);
+        });
+        removeCoverBtn.addEventListener('click', () => {
+            if (!currentDocumentRecord) {
+                return;
+            }
+
+            delete currentDocumentRecord.coverDataUrl;
+            saveStoredDocument(currentDocumentRecord);
+            documentStatus.textContent = 'Заставку книги видалено.';
+        });
         deleteFileBtn.addEventListener('click', deleteCurrentDocument);
+
+        coverInput.addEventListener('change', (event) => {
+            const file = event.target.files?.[0];
+            if (!file || !currentDocumentRecord) {
+                coverInput.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                currentDocumentRecord.coverDataUrl = String(reader.result || '');
+                currentDocumentRecord.coverName = file.name;
+                saveStoredDocument(currentDocumentRecord);
+                documentStatus.textContent = 'Заставку книги оновлено.';
+                coverInput.value = '';
+            };
+            reader.onerror = () => {
+                documentStatus.textContent = 'Не вдалося завантажити заставку книги.';
+                coverInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
 
         fileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
