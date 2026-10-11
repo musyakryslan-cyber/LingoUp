@@ -204,6 +204,10 @@
             display: block;
         }
 
+        .saved-image-library[hidden] {
+            display: none;
+        }
+
         .saved-image-library h3 {
             margin-bottom: 0.65rem;
             color: var(--primary-blue);
@@ -751,11 +755,11 @@
                 <details id="readingAdminInfo" class="reading-admin-info" hidden>
                     <summary>Адміністративна інформація</summary>
                     <p>Зображення зберігаються у приватному сховищі акаунтів до видалення власником. Власник має доступ до власних зображень на пристроях, де він увійшов у той самий акаунт. Адміністратори можуть переглядати зображення в адмінпанелі.</p>
+                    <div id="savedImageLibrary" class="saved-image-library" aria-live="polite" hidden>
+                        <h3>Збережені зображення</h3>
+                        <div id="savedImageList" class="saved-image-list"></div>
+                    </div>
                 </details>
-                <div id="savedImageLibrary" class="saved-image-library" aria-live="polite">
-                    <h3>Збережені зображення</h3>
-                    <div id="savedImageList" class="saved-image-list"></div>
-                </div>
 
                 <div id="documentViewer" class="document-viewer">
                     <div class="document-meta">
@@ -1571,9 +1575,19 @@
         }
 
         async function refreshReadingImageLibrary() {
-            const images = await LingoUp.listReadingImages();
+            const user = await LingoUp.getCurrentUser();
+            const profile = user ? await LingoUp.getProfile(user.id) : null;
+            const canViewLibrary = Boolean(user && profile?.is_admin);
+            savedImageLibrary.hidden = !canViewLibrary;
+            if (!canViewLibrary) {
+                savedImageList.replaceChildren();
+                savedImageLibrary.classList.remove('visible');
+                return [];
+            }
+
+            const images = await LingoUp.listAllReadingImagesForAdmin();
             savedImageList.replaceChildren();
-            savedImageLibrary.classList.toggle('visible', images.length > 0);
+            savedImageLibrary.classList.toggle('visible', canViewLibrary);
 
             for (const image of images) {
                 const button = document.createElement('button');
@@ -1617,7 +1631,7 @@
 
             button.disabled = true;
             try {
-                const images = await LingoUp.listReadingImages();
+                const images = await LingoUp.listAllReadingImagesForAdmin();
                 const image = images.find((item) => item.path === button.dataset.storagePath);
                 if (!image) {
                     throw new Error('Це зображення більше не збережене на сервері.');
@@ -2224,8 +2238,9 @@
 
         async function restoreReadingDocument() {
             const user = await LingoUp.getCurrentUser();
+            let profile = null;
             if (user) {
-                const profile = await LingoUp.getProfile(user.id);
+                profile = await LingoUp.getProfile(user.id);
                 readingAdminInfo.hidden = !profile.is_admin;
             }
 
@@ -2237,7 +2252,18 @@
                 throw new Error('Не вдалося відновити збережений файл із цього браузера.');
             }
 
-            const images = await refreshReadingImageLibrary();
+            const images = user
+                ? profile.is_admin
+                    ? await LingoUp.listAllReadingImagesForAdmin()
+                    : await LingoUp.listReadingImages()
+                : [];
+            if (profile?.is_admin) {
+                await refreshReadingImageLibrary();
+            } else {
+                savedImageLibrary.hidden = true;
+                savedImageLibrary.classList.remove('visible');
+                savedImageList.replaceChildren();
+            }
 
             if (saved?.name) {
                 await renderSavedDocument(saved);

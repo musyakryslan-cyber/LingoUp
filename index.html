@@ -147,6 +147,43 @@
             transform: translateY(-2px);
         }
 
+        .external-tools {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .external-tools-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+        }
+
+        .external-tool-link {
+            display: inline-flex;
+            width: 48px;
+            height: 48px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--primary-blue);
+            font-size: 1rem;
+            font-weight: 800;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .external-tool-link:hover {
+            border-color: var(--primary-green);
+            background: #ecfdf5;
+        }
+
         /* Hero секція */
         .hero {
             position: relative;
@@ -409,7 +446,7 @@
                 gap: 0.75rem 1.25rem;
             }
 
-            .navbar > .btn-primary {
+            .external-tools .btn-primary {
                 padding: 0.6rem 1rem;
             }
 
@@ -687,7 +724,14 @@
                 <li><a href="reviews.html">Відгуки</a></li>
                 <li id="admin-link" style="display: none;"><a href="admin.html">Адмінпанель</a></li>
             </ul>
-            <a href="profile.html" class="btn-primary" id="auth-cta">Кабінет</a>
+            <div class="external-tools">
+                <a href="profile.html" class="btn-primary" id="auth-cta">Кабінет</a>
+                <div class="external-tools-links" aria-label="Зовнішні сервіси">
+                    <a class="external-tool-link" href="https://miro.com/" target="_blank" rel="noopener noreferrer" aria-label="Miro" title="Miro">M</a>
+                    <a class="external-tool-link" href="https://quizlet.com/" target="_blank" rel="noopener noreferrer" aria-label="Quizlet" title="Quizlet">Q</a>
+                    <a class="external-tool-link" href="https://zoom.us/" target="_blank" rel="noopener noreferrer" aria-label="Zoom" title="Zoom">Z</a>
+                </div>
+            </div>
         </nav>
     </header>
 
