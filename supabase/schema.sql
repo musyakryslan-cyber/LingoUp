@@ -129,6 +129,16 @@ create policy "Users can read their own reading images"
         and (storage.foldername(name))[1] = (select auth.uid())::text
     );
 
+drop policy if exists "Administrators can read all reading images" on storage.objects;
+create policy "Administrators can read all reading images"
+    on storage.objects
+    for select
+    to authenticated
+    using (
+        bucket_id = 'lingoup-reading-images'
+        and (select public.is_lingoup_admin())
+    );
+
 drop policy if exists "Users can upload their own reading images" on storage.objects;
 create policy "Users can upload their own reading images"
     on storage.objects

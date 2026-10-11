@@ -139,8 +139,16 @@
 
     async function getReadingImageUrl(path) {
         const user = await getCurrentUser();
-        if (!user || typeof path !== 'string' || !path.startsWith(`${user.id}/`)) {
+        if (!user || typeof path !== 'string') {
             throw new Error('Увійдіть в акаунт власника зображення, щоб переглянути його.');
+        }
+
+        const isOwner = path.startsWith(`${user.id}/`);
+        if (!isOwner) {
+            const profile = await getProfile(user.id);
+            if (!profile.is_admin) {
+                throw new Error('Переглядати це зображення може лише його власник або адміністратор.');
+            }
         }
 
         const { data, error } = await getClient()
@@ -189,6 +197,61 @@
                 return images;
             }
         }
+    }
+
+    async function listAllReadingImagesForAdmin() {
+        const user = await getCurrentUser();
+        if (!user) {
+            throw new Error('Увійдіть в акаунт адміністратора.');
+        }
+
+        const profile = await getProfile(user.id);
+        if (!profile.is_admin) {
+            throw new Error('Переглядати всі зображення може лише адміністратор.');
+        }
+
+        const { data: profiles, error: profilesError } = await getClient()
+            .from('profiles')
+            .select('id, name, surname, email')
+            .order('email', { ascending: true });
+        if (profilesError) {
+            throw profilesError;
+        }
+
+        const storage = getClient().storage.from('lingoup-reading-images');
+        const allImages = [];
+        const pageSize = 100;
+
+        for (const owner of profiles || []) {
+            for (let offset = 0; ; offset += pageSize) {
+                const { data, error } = await storage.list(owner.id, {
+                    limit: pageSize,
+                    offset,
+                    sortBy: { column: 'created_at', order: 'desc' }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                allImages.push(...(data || [])
+                    .filter((item) => item.id && item.name)
+                    .map((item) => ({
+                        path: `${owner.id}/${item.name}`,
+                        userId: owner.id,
+                        ownerName: [owner.name, owner.surname].filter(Boolean).join(' '),
+                        ownerEmail: owner.email,
+                        name: item.name,
+                        createdAt: item.created_at || null
+                    })));
+
+                if (!data || data.length < pageSize) {
+                    break;
+                }
+            }
+        }
+
+        return allImages;
     }
 
     async function deleteReadingImage(path) {
@@ -272,6 +335,7 @@
         uploadReadingImage,
         getReadingImageUrl,
         listReadingImages,
+        listAllReadingImagesForAdmin,
         deleteReadingImage,
         getReviews,
         createReview,

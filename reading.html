@@ -175,6 +175,22 @@
             font-size: 0.92rem;
         }
 
+        .reading-admin-info {
+            margin: 0.25rem 0 1rem;
+            color: #475569;
+            font-size: 0.92rem;
+        }
+
+        .reading-admin-info summary {
+            color: var(--primary-blue);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .reading-admin-info p {
+            margin-top: 0.5rem;
+        }
+
         .saved-image-library {
             display: none;
             margin: 1rem 0;
@@ -732,7 +748,10 @@
                         <button type="button" class="upload-btn" id="chooseFileBtn">Додати файл</button>
                     </div>
                 </div>
-                <p class="upload-note">Усі завантажені зображення зберігаються на сервері у вашому акаунті, доки ви їх не видалите, і доступні на інших пристроях після входу в той самий акаунт. Щоб завантажити або видалити їх, увійдіть в акаунт. Текст розпізнається англійською й українською у браузері; під час озвучення слово підсвічується на зображенні без контуру. Для перекладу вибраний текст надсилається сервісу MyMemory.</p>
+                <details id="readingAdminInfo" class="reading-admin-info" hidden>
+                    <summary>Адміністративна інформація</summary>
+                    <p>Зображення зберігаються у приватному сховищі акаунтів до видалення власником. Власник має доступ до власних зображень на пристроях, де він увійшов у той самий акаунт. Адміністратори можуть переглядати зображення в адмінпанелі.</p>
+                </details>
                 <div id="savedImageLibrary" class="saved-image-library" aria-live="polite">
                     <h3>Збережені зображення</h3>
                     <div id="savedImageList" class="saved-image-list"></div>
@@ -799,6 +818,7 @@
         const savedImageList = document.getElementById('savedImageList');
         const documentViewer = document.getElementById('documentViewer');
         const documentName = document.getElementById('documentName');
+        const readingAdminInfo = document.getElementById('readingAdminInfo');
         const documentContent = document.getElementById('documentContent');
         const documentTranslation = document.getElementById('documentTranslation');
         const documentImageFrame = document.getElementById('documentImageFrame');
@@ -2203,6 +2223,12 @@
         });
 
         async function restoreReadingDocument() {
+            const user = await LingoUp.getCurrentUser();
+            if (user) {
+                const profile = await LingoUp.getProfile(user.id);
+                readingAdminInfo.hidden = !profile.is_admin;
+            }
+
             let saved = null;
             try {
                 saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');

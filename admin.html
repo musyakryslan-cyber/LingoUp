@@ -204,6 +204,37 @@
             border-radius: 12px;
         }
 
+        .reading-image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .reading-image-card {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: #f8fafc;
+        }
+
+        .reading-image-card img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: contain;
+            background: #e2e8f0;
+        }
+
+        .reading-image-details {
+            padding: 0.75rem;
+            overflow-wrap: anywhere;
+        }
+
+        .reading-image-details p + p {
+            margin-top: 0.25rem;
+        }
+
         .admin-contact-value {
             color: #64748b;
             overflow-wrap: anywhere;
@@ -271,6 +302,15 @@
             <p id="contactsAdminStatus" role="status" aria-live="polite">Завантаження контактів...</p>
             <ul id="adminContactsList" class="admin-contacts"></ul>
         </section>
+        <section class="card" id="readingImagesSection" aria-labelledby="readingImagesTitle" hidden>
+            <div class="users-heading">
+                <h2 id="readingImagesTitle">Приватні зображення читання</h2>
+                <button class="refresh-button" id="refreshReadingImages" type="button">Оновити список</button>
+            </div>
+            <p>Список доступний лише адміністраторам. Інші користувачі бачать лише власні зображення.</p>
+            <p id="readingImagesStatus" role="status" aria-live="polite">Завантаження зображень...</p>
+            <div id="readingImagesList" class="reading-image-grid"></div>
+        </section>
         <section class="card" aria-labelledby="usersTitle">
             <div class="users-heading">
                 <h2 id="usersTitle">Зареєстровані користувачі</h2>
@@ -297,7 +337,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabase-client.js?v=4"></script>
+    <script src="supabase-client.js?v=5"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const status = document.getElementById('usersStatus');
@@ -307,6 +347,10 @@
             const contactsList = document.getElementById('adminContactsList');
             const contactForm = document.getElementById('contactForm');
             const addContactButton = document.getElementById('addContactButton');
+            const readingImagesSection = document.getElementById('readingImagesSection');
+            const readingImagesStatus = document.getElementById('readingImagesStatus');
+            const readingImagesList = document.getElementById('readingImagesList');
+            const refreshReadingImagesButton = document.getElementById('refreshReadingImages');
 
             let client;
             try {
@@ -324,6 +368,7 @@
                 }
                 document.getElementById('adminWelcome').textContent =
                     `Вітаємо, ${profile.name} ${profile.surname}!`;
+                readingImagesSection.hidden = false;
             } catch (error) {
                 status.textContent = error.message || 'Не вдалося перевірити права адміністратора.';
                 status.classList.add('error');
@@ -331,6 +376,51 @@
                 addContactButton.disabled = true;
                 return;
             }
+
+            async function loadReadingImages() {
+                refreshReadingImagesButton.disabled = true;
+                readingImagesStatus.classList.remove('error');
+                readingImagesStatus.textContent = 'Завантаження зображень...';
+                try {
+                    const images = await LingoUp.listAllReadingImagesForAdmin();
+                    const cards = await Promise.all(images.map(async (image) => {
+                        const card = document.createElement('article');
+                        card.className = 'reading-image-card';
+
+                        const preview = document.createElement('img');
+                        preview.alt = `Зображення ${image.name}`;
+                        preview.loading = 'lazy';
+                        preview.src = await LingoUp.getReadingImageUrl(image.path);
+
+                        const details = document.createElement('div');
+                        details.className = 'reading-image-details';
+                        const filename = document.createElement('strong');
+                        filename.textContent = image.name;
+                        const owner = document.createElement('p');
+                        owner.textContent = image.ownerName || image.ownerEmail || image.userId;
+                        const uploadedAt = document.createElement('p');
+                        uploadedAt.textContent = image.createdAt
+                            ? new Date(image.createdAt).toLocaleString('uk-UA')
+                            : 'Дата невідома';
+                        details.append(filename, owner, uploadedAt);
+                        card.append(preview, details);
+                        return card;
+                    }));
+
+                    readingImagesList.replaceChildren(...cards);
+                    readingImagesStatus.textContent = images.length
+                        ? `Збережених зображень: ${images.length}`
+                        : 'Збережених зображень поки немає.';
+                } catch (error) {
+                    console.error('Не вдалося завантажити приватні зображення:', error);
+                    readingImagesStatus.textContent = error.message || 'Не вдалося завантажити приватні зображення.';
+                    readingImagesStatus.classList.add('error');
+                } finally {
+                    refreshReadingImagesButton.disabled = false;
+                }
+            }
+
+            refreshReadingImagesButton.addEventListener('click', loadReadingImages);
 
             async function loadContacts() {
                 contactsStatus.classList.remove('error');
@@ -387,6 +477,7 @@
             });
 
             loadContacts();
+            loadReadingImages();
 
             async function loadUsers() {
                 refreshButton.disabled = true;
