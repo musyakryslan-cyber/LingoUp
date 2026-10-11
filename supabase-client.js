@@ -154,6 +154,36 @@
         return data.signedUrl;
     }
 
+    async function getLatestReadingImage() {
+        const user = await getCurrentUser();
+        if (!user) {
+            return null;
+        }
+
+        const { data, error } = await getClient()
+            .storage
+            .from('lingoup-reading-images')
+            .list(user.id, {
+                limit: 1,
+                sortBy: { column: 'created_at', order: 'desc' }
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const image = data?.find((item) => item.id && item.name);
+        if (!image) {
+            return null;
+        }
+
+        return {
+            path: `${user.id}/${image.name}`,
+            userId: user.id,
+            name: image.name
+        };
+    }
+
     async function deleteReadingImage(path) {
         const user = await getCurrentUser();
         if (!user || typeof path !== 'string' || !path.startsWith(`${user.id}/`)) {
@@ -234,6 +264,7 @@
         uploadAvatar,
         uploadReadingImage,
         getReadingImageUrl,
+        getLatestReadingImage,
         deleteReadingImage,
         getReviews,
         createReview,

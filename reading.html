@@ -304,20 +304,28 @@
             min-width: 0;
         }
 
+        .document-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .document-tools {
             display: flex;
+            justify-content: center;
             gap: 0.75rem;
             flex-wrap: wrap;
         }
 
         .document-playback-row {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
         }
 
         .document-playback-row .speech-controls {
-            margin-top: -0.35rem;
-            margin-bottom: 1rem;
+            margin-top: 0;
+            margin-bottom: 0;
         }
 
         .action-btn {
@@ -392,6 +400,10 @@
             position: fixed;
             z-index: 200;
             display: none;
+            width: max-content;
+            max-width: min(320px, calc(100vw - 16px));
+            max-height: calc(100vh - 16px);
+            overflow: auto;
             padding: 0.35rem;
             background: var(--white);
             border: 1px solid #bfdbfe;
@@ -411,6 +423,37 @@
             color: var(--primary-blue);
             font-weight: 700;
             cursor: pointer;
+        }
+
+        .selected-word-translation {
+            display: none;
+            align-items: flex-start;
+            gap: 0.4rem;
+            max-width: 280px;
+            padding: 0.5rem 0.65rem;
+            color: #065f46;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .selected-word-translation.visible {
+            display: flex;
+        }
+
+        .selected-word-translation-text {
+            flex: 1;
+        }
+
+        .selected-word-translation .selected-word-speak-btn {
+            flex: 0 0 auto;
+            display: none;
+            padding: 0.2rem 0.35rem;
+            line-height: 1;
+        }
+
+        .selected-word-translation.has-translation .selected-word-speak-btn {
+            display: inline-flex;
         }
 
         .doc-preview-image {
@@ -462,6 +505,42 @@
             color: var(--primary-blue);
             font-size: 1.5rem;
             cursor: pointer;
+        }
+
+        .image-lightbox-toolbar {
+            position: fixed;
+            z-index: 2;
+            top: 1rem;
+            left: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            width: max-content;
+            max-width: calc(100vw - 2rem);
+            padding: 0.65rem 0.85rem;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.88);
+            transform: translateX(-50%);
+        }
+
+        .image-lightbox-toolbar .document-tools {
+            justify-content: center;
+        }
+
+        .image-lightbox-toolbar .document-controls {
+            position: static;
+            align-items: center;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            border: 0;
+        }
+
+        .image-lightbox-toolbar .speech-controls {
+            justify-content: center;
+            margin: 0;
         }
 
         .image-lightbox-content {
@@ -599,7 +678,7 @@
                         <button type="button" class="upload-btn" id="chooseFileBtn">Додати файл</button>
                     </div>
                 </div>
-                <p class="upload-note">Зображення зберігається на сервері у вашому акаунті. Щоб завантажити або видалити його, увійдіть в акаунт. Текст розпізнається англійською й українською у браузері; під час озвучення слово підсвічується на зображенні без контуру. Для перекладу вибраний текст надсилається сервісу MyMemory.</p>
+                <p class="upload-note">Зображення зберігається на сервері у вашому акаунті й доступне на інших пристроях після входу в той самий акаунт. Щоб завантажити або видалити його, увійдіть в акаунт. Текст розпізнається англійською й українською у браузері; під час озвучення слово підсвічується на зображенні без контуру. Для перекладу вибраний текст надсилається сервісу MyMemory.</p>
 
                 <div id="documentViewer" class="document-viewer">
                     <div class="document-meta">
@@ -607,17 +686,18 @@
                             <strong id="documentName">Без назви</strong>
                             <button type="button" class="delete-btn" id="deleteFileBtn" aria-label="Видалити файл" title="Видалити файл">🗑️</button>
                         </div>
-                        <div class="document-tools">
-                            <button type="button" class="action-btn" id="readDocumentBtn"><span aria-hidden="true">🔊</span> Прочитати</button>
-                            <button type="button" class="action-btn" id="translateDocumentBtn"><span aria-hidden="true">🗣️</span> Перекласти</button>
-                        </div>
-                    </div>
-
-                    <div class="document-playback-row">
-                        <div id="speechControls" class="speech-controls" aria-live="polite">
-                            <button type="button" class="speech-btn" id="slowSpeechBtn" aria-label="Сповільнити вимову" title="Сповільнити">⏪</button>
-                            <button type="button" class="speech-btn" id="fastSpeechBtn" aria-label="Пришвидшити вимову" title="Пришвидшити">⏩</button>
-                            <button type="button" class="speech-btn" id="pauseSpeechBtn" aria-label="Пауза" title="Пауза">⏸</button>
+                        <div class="document-controls">
+                            <div class="document-tools">
+                                <button type="button" class="action-btn" id="readDocumentBtn"><span aria-hidden="true">🔊</span> Прочитати</button>
+                                <button type="button" class="action-btn" id="translateDocumentBtn"><span aria-hidden="true">🗣️</span> Перекласти</button>
+                            </div>
+                            <div class="document-playback-row">
+                                <div id="speechControls" class="speech-controls" aria-live="polite">
+                                    <button type="button" class="speech-btn" id="slowSpeechBtn" aria-label="Сповільнити вимову" title="Сповільнити">⏪</button>
+                                    <button type="button" class="speech-btn" id="fastSpeechBtn" aria-label="Пришвидшити вимову" title="Пришвидшити">⏩</button>
+                                    <button type="button" class="speech-btn" id="pauseSpeechBtn" aria-label="Пауза" title="Пауза">⏸</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -628,12 +708,17 @@
                     <dialog id="imageLightbox" class="image-lightbox" aria-label="Зображення на весь екран">
                         <button type="button" id="closeImageLightboxBtn" class="image-lightbox-close" aria-label="Закрити повноекранний перегляд">×</button>
                         <div id="imageLightboxContent" class="image-lightbox-content"></div>
+                        <div id="imageLightboxToolbar" class="image-lightbox-toolbar"></div>
                     </dialog>
                     <div id="pdfPreview" class="pdf-preview"></div>
                     <div id="documentContent" class="document-content"></div>
                     <div id="documentStatus" class="status-text" aria-live="polite"></div>
                     <div id="selectedWordActions" class="selected-word-actions">
                         <button type="button" id="translateSelectionBtn">Перекласти</button>
+                        <div id="selectedWordTranslation" class="selected-word-translation" aria-live="polite">
+                            <span id="selectedWordTranslationText" class="selected-word-translation-text"></span>
+                            <button type="button" id="selectedWordSpeakBtn" class="selected-word-speak-btn" aria-label="Озвучити переклад" title="Озвучити переклад">🔊</button>
+                        </div>
                     </div>
                     <div id="documentTranslation" class="document-translation"></div>
                 </div>
@@ -645,7 +730,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabase-client.js?v=5"></script>
+    <script src="supabase-client.js?v=6"></script>
     <script>
         const STORAGE_KEY = 'lingoup-reading-current-file';
         const fileInput = document.getElementById('documentInput');
@@ -660,11 +745,17 @@
         const imageWordOverlay = document.getElementById('imageWordOverlay');
         const imageLightbox = document.getElementById('imageLightbox');
         const imageLightboxContent = document.getElementById('imageLightboxContent');
+        const imageLightboxToolbar = document.getElementById('imageLightboxToolbar');
         const closeImageLightboxBtn = document.getElementById('closeImageLightboxBtn');
+        const documentControls = document.querySelector('.document-controls');
+        const documentTools = document.querySelector('.document-tools');
         const pdfPreview = document.getElementById('pdfPreview');
         const documentStatus = document.getElementById('documentStatus');
         const selectedWordActions = document.getElementById('selectedWordActions');
         const translateSelectionBtn = document.getElementById('translateSelectionBtn');
+        const selectedWordTranslation = document.getElementById('selectedWordTranslation');
+        const selectedWordTranslationText = document.getElementById('selectedWordTranslationText');
+        const selectedWordSpeakBtn = document.getElementById('selectedWordSpeakBtn');
         const readDocumentBtn = document.getElementById('readDocumentBtn');
         const translateDocumentBtn = document.getElementById('translateDocumentBtn');
         const speechControls = document.getElementById('speechControls');
@@ -682,7 +773,10 @@
         let currentDocumentRecord = null;
         let imageFrameOriginalParent = null;
         let imageFrameOriginalNextSibling = null;
+        let lightboxControlsOriginalPositions = [];
         let currentSelectedText = '';
+        let currentSelectedTranslation = '';
+        let currentSelectedTranslationLanguage = 'uk-UA';
         let currentSelectedRange = null;
         let imageSelectionStart = null;
         let imageSelectionEnd = null;
@@ -810,9 +904,15 @@
             imageFrameOriginalParent = documentImageFrame.parentElement;
             imageFrameOriginalNextSibling = documentImageFrame.nextSibling;
             imageLightboxContent.appendChild(documentImageFrame);
+            lightboxControlsOriginalPositions = [documentControls].map((element) => ({
+                element,
+                parent: element.parentElement,
+                nextSibling: element.nextSibling
+            }));
+            imageLightboxToolbar.append(documentControls);
 
             const availableWidth = window.innerWidth - 32;
-            const availableHeight = window.innerHeight - 64;
+            const availableHeight = window.innerHeight - 220;
             const aspectRatio = documentImage.naturalWidth / documentImage.naturalHeight;
             const width = Math.min(availableWidth, availableHeight * aspectRatio);
             const height = width / aspectRatio;
@@ -828,7 +928,7 @@
             }
 
             const availableWidth = window.innerWidth - 32;
-            const availableHeight = window.innerHeight - 64;
+            const availableHeight = window.innerHeight - 220;
             const aspectRatio = documentImage.naturalWidth / documentImage.naturalHeight;
             const width = Math.min(availableWidth, availableHeight * aspectRatio);
             documentImageFrame.style.width = `${width}px`;
@@ -850,6 +950,17 @@
             imageFrameOriginalParent = null;
             imageFrameOriginalNextSibling = null;
             renderImageWordOverlays(currentImageWords);
+        }
+
+        function restoreLightboxControls() {
+            lightboxControlsOriginalPositions.forEach(({ element, parent, nextSibling }) => {
+                if (nextSibling && nextSibling.parentNode === parent) {
+                    parent.insertBefore(element, nextSibling);
+                } else {
+                    parent.appendChild(element);
+                }
+            });
+            lightboxControlsOriginalPositions = [];
         }
 
         function hideDocumentImage() {
@@ -966,17 +1077,60 @@
             });
         }
 
-        function positionSelectionActions(x, y) {
+        function getSelectedWordsBounds() {
+            const selectedWords = [
+                ...documentContent.querySelectorAll('.karaoke-word.selected'),
+                ...imageWordOverlay.querySelectorAll('.image-word-highlight.selected')
+            ];
+            if (!selectedWords.length) {
+                return null;
+            }
+
+            const visibleWords = selectedWords.filter((word) => {
+                const rect = word.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+            });
+            if (!visibleWords.length) {
+                return null;
+            }
+
+            return visibleWords.reduce((bounds, word) => {
+                const rect = word.getBoundingClientRect();
+                if (!bounds) {
+                    return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+                }
+                bounds.left = Math.min(bounds.left, rect.left);
+                bounds.right = Math.max(bounds.right, rect.right);
+                bounds.top = Math.min(bounds.top, rect.top);
+                bounds.bottom = Math.max(bounds.bottom, rect.bottom);
+                return bounds;
+            }, null);
+        }
+
+        function positionSelectionActions(anchor) {
             selectedWordActions.classList.add('visible');
             const rect = selectedWordActions.getBoundingClientRect();
-            selectedWordActions.style.left = `${Math.max(8, Math.min(x, window.innerWidth - rect.width - 8))}px`;
-            selectedWordActions.style.top = `${Math.max(8, Math.min(y, window.innerHeight - rect.height - 8))}px`;
+            const bounds = getSelectedWordsBounds();
+            const left = bounds
+                ? bounds.left + (bounds.right - bounds.left - rect.width) / 2
+                : anchor.x - rect.width / 2;
+            const aboveTop = bounds ? bounds.top - rect.height - 8 : anchor.y - rect.height - 8;
+            const belowTop = bounds ? bounds.bottom + 8 : anchor.y + 8;
+            const top = aboveTop >= 8 ? aboveTop : Math.min(belowTop, window.innerHeight - rect.height - 8);
+            selectedWordActions.style.left = `${Math.max(8, Math.min(left, window.innerWidth - rect.width - 8))}px`;
+            selectedWordActions.style.top = `${Math.max(8, top)}px`;
         }
 
         function clearSelectedText() {
             currentSelectedText = '';
             currentSelectedRange = null;
             selectedWordActions.classList.remove('visible');
+            selectedWordTranslation.classList.remove('visible');
+            selectedWordTranslation.classList.remove('has-translation');
+            selectedWordTranslationText.textContent = '';
+            currentSelectedTranslation = '';
+            translateSelectionBtn.disabled = false;
+            translateSelectionBtn.textContent = 'Перекласти';
             documentContent.querySelectorAll('.karaoke-word.selected').forEach((word) => {
                 word.classList.remove('selected');
             });
@@ -1009,7 +1163,13 @@
                 const wordEnd = Number(word.dataset.end);
                 word.classList.toggle('selected', wordStart < selectedEnd && wordEnd > selectedStart);
             });
-            positionSelectionActions(anchor.x, anchor.y);
+            selectedWordTranslation.classList.remove('visible');
+            selectedWordTranslation.classList.remove('has-translation');
+            selectedWordTranslationText.textContent = '';
+            currentSelectedTranslation = '';
+            translateSelectionBtn.disabled = false;
+            translateSelectionBtn.textContent = 'Перекласти';
+            positionSelectionActions(anchor);
             return trimmedText;
         }
 
@@ -1029,6 +1189,17 @@
             readingResumeOffset = nextOffset < currentText.length ? nextOffset : null;
             updateReadDocumentButton();
             speakText(text, 'Виділений текст озвучується.', offset);
+        }
+
+        function getPreferredSpeechVoice(language) {
+            const voices = window.speechSynthesis.getVoices();
+            const languagePrefix = language.slice(0, 2).toLowerCase();
+            const feminineVoiceName = /\b(female|zira|jenny|aria|ava|samantha|susan|hazel|sonia|michelle|catherine|heami|huihui|yaoyao)\b/i;
+            const feminineVoices = voices.filter((voice) => feminineVoiceName.test(voice.name));
+            return feminineVoices.find((voice) => voice.lang.toLowerCase().startsWith(languagePrefix))
+                || feminineVoices[0]
+                || voices.find((voice) => voice.lang.toLowerCase().startsWith(languagePrefix))
+                || null;
         }
 
         function selectImageWords(firstIndex, lastIndex, anchor) {
@@ -1139,18 +1310,44 @@
             documentContent.innerHTML = value || '<p>Текст відсутній.</p>';
         }
 
-        async function translateText(text) {
-            const normalizedText = normalizeText(text);
-            if (!normalizedText) {
-                throw new Error('Немає тексту для перекладу.');
-            }
-            if (normalizedText.length > 500) {
-                throw new Error('Сервіс перекладає до 500 символів за раз. Виділіть коротший фрагмент.');
+        function splitTranslationText(text, maxLength = 500) {
+            const chunks = [];
+            const separators = [];
+            let remainingText = text;
+
+            while (remainingText.length > maxLength) {
+                let splitIndex = remainingText.lastIndexOf(' ', maxLength);
+                const newlineIndex = remainingText.lastIndexOf('\n', maxLength);
+                splitIndex = Math.max(splitIndex, newlineIndex);
+                if (splitIndex <= 0) {
+                    splitIndex = maxLength;
+                }
+
+                const chunk = remainingText.slice(0, splitIndex).trimEnd();
+                const separatorMatch = remainingText.slice(splitIndex).match(/^\s+/);
+                const separator = separatorMatch ? separatorMatch[0] : '';
+                if (!chunk) {
+                    throw new Error('Не вдалося розділити текст для перекладу.');
+                }
+
+                chunks.push(chunk);
+                separators.push(separator);
+                remainingText = remainingText.slice(splitIndex + separator.length);
             }
 
-            const sourceLanguage = /[\u0400-\u04FF]/.test(normalizedText) ? 'uk' : 'en';
+            if (remainingText) {
+                chunks.push(remainingText);
+            }
+            return chunks.map((chunk, index) => ({
+                text: chunk,
+                separatorAfter: separators[index] || ''
+            }));
+        }
+
+        async function translateTextChunk(text) {
+            const sourceLanguage = /[\u0400-\u04FF]/.test(text) ? 'uk' : 'en';
             const parameters = new URLSearchParams({
-                q: normalizedText,
+                q: text,
                 langpair: `${sourceLanguage}|${sourceLanguage === 'uk' ? 'en' : 'uk'}`
             });
             const controller = new AbortController();
@@ -1178,6 +1375,23 @@
             } finally {
                 window.clearTimeout(timeoutId);
             }
+        }
+
+        async function translateText(text, onProgress) {
+            const normalizedText = normalizeText(text);
+            if (!normalizedText) {
+                throw new Error('Немає тексту для перекладу.');
+            }
+
+            const chunks = splitTranslationText(normalizedText);
+            const translatedChunks = [];
+            for (let index = 0; index < chunks.length; index += 1) {
+                onProgress?.(index + 1, chunks.length);
+                translatedChunks.push(
+                    `${await translateTextChunk(chunks[index].text)}${chunks[index].separatorAfter}`
+                );
+            }
+            return translatedChunks.join('');
         }
 
         async function renderPdfPreviewFromDataUrl(dataUrl) {
@@ -1447,7 +1661,14 @@
             }
         });
 
-        function speakText(text, statusMessage = 'Озвучення запущено.', characterOffset = 0, onComplete = null) {
+        function speakText(
+            text,
+            statusMessage = 'Озвучення запущено.',
+            characterOffset = 0,
+            onComplete = null,
+            language = 'uk-UA',
+            highlightWords = true
+        ) {
             if (!text || !('speechSynthesis' in window)) {
                 if (!text) {
                     documentStatus.textContent = 'Спочатку виберіть файл.';
@@ -1458,10 +1679,20 @@
             }
 
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'uk-UA';
+            utterance.lang = language;
+            const preferredVoice = getPreferredSpeechVoice(language);
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
             utterance.rate = currentSpeechRate;
+            utterance.pitch = 1.08;
+            utterance.onstart = () => {
+                if (activeSpeechUtterance === utterance) {
+                    documentStatus.textContent = statusMessage;
+                }
+            };
             utterance.onboundary = (event) => {
-                if (activeSpeechUtterance === utterance && event.name === 'word') {
+                if (highlightWords && activeSpeechUtterance === utterance && event.name === 'word') {
                     highlightKaraokeWord(event.charIndex + characterOffset);
                 }
             };
@@ -1474,10 +1705,13 @@
                     }
                 }
             };
-            utterance.onerror = () => {
+            utterance.onerror = (event) => {
                 if (activeSpeechUtterance === utterance) {
                     clearKaraokeHighlight();
                     activeSpeechUtterance = null;
+                    if (event.error !== 'interrupted' && event.error !== 'canceled') {
+                        documentStatus.textContent = 'Браузер не зміг озвучити текст. Перевірте доступність голосу для цієї мови.';
+                    }
                 }
             };
             clearKaraokeHighlight();
@@ -1532,6 +1766,7 @@
             }
         });
         imageLightbox.addEventListener('close', restoreImageFrame);
+        imageLightbox.addEventListener('close', restoreLightboxControls);
         window.addEventListener('resize', resizeImageLightbox);
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && imageLightbox.open) {
@@ -1681,21 +1916,52 @@
             if (!currentSelectedText) {
                 return;
             }
-            documentTranslation.classList.add('visible');
-            documentTranslation.textContent = 'Перекладаємо...';
+            selectedWordActions.classList.add('visible');
+            selectedWordTranslation.classList.add('visible');
+            selectedWordTranslation.classList.remove('has-translation');
+            selectedWordTranslationText.textContent = 'Перекладаємо...';
             translateSelectionBtn.disabled = true;
-            selectedWordActions.classList.remove('visible');
+            translateSelectionBtn.textContent = 'Перекладаємо...';
+            positionSelectionActions({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
             try {
                 const translatedText = await translateText(currentSelectedText);
-                documentTranslation.textContent = `Переклад: ${translatedText}`;
-                documentStatus.textContent = 'Переклад виділеного тексту показано.';
+                currentSelectedTranslation = translatedText;
+                currentSelectedTranslationLanguage = /[\u0400-\u04FF]/.test(normalizeText(currentSelectedText))
+                    ? 'en-US'
+                    : 'uk-UA';
+                selectedWordTranslationText.textContent = translatedText;
+                selectedWordTranslation.classList.add('has-translation');
+                translateSelectionBtn.textContent = 'Перекласти ще раз';
+                positionSelectionActions({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                speakText(
+                    currentSelectedTranslation,
+                    'Озвучення перекладу.',
+                    0,
+                    null,
+                    currentSelectedTranslationLanguage,
+                    false
+                );
             } catch (error) {
                 console.error('Не вдалося перекласти виділений текст:', error);
-                documentTranslation.textContent = error.message || 'Не вдалося перекласти текст.';
+                selectedWordTranslationText.textContent = error.message || 'Не вдалося перекласти текст.';
                 documentStatus.textContent = 'Не вдалося перекласти виділений текст.';
             } finally {
                 translateSelectionBtn.disabled = false;
             }
+        });
+
+        selectedWordSpeakBtn.addEventListener('click', () => {
+            if (!currentSelectedTranslation) {
+                return;
+            }
+            speakText(
+                currentSelectedTranslation,
+                'Озвучення перекладу.',
+                0,
+                null,
+                currentSelectedTranslationLanguage,
+                false
+            );
         });
 
         document.addEventListener('pointerdown', (event) => {
@@ -1767,7 +2033,9 @@
             documentTranslation.textContent = 'Перекладаємо...';
             translateDocumentBtn.disabled = true;
             try {
-                const translatedText = await translateText(currentText);
+                const translatedText = await translateText(currentText, (index, total) => {
+                    documentTranslation.textContent = `Перекладаємо фрагмент ${index} із ${total}...`;
+                });
                 documentTranslation.textContent = `Переклад: ${translatedText}`;
                 documentStatus.textContent = 'Переклад показано.';
             } catch (error) {
@@ -1779,18 +2047,51 @@
             }
         });
 
-        try {
-            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-            if (saved && saved.name) {
-                renderSavedDocument(saved).catch((error) => {
-                    console.error('Не вдалося відновити збережений файл:', error);
-                    documentStatus.textContent = error.message || 'Не вдалося відновити файл.';
-                    documentViewer.classList.add('visible');
-                });
+        async function restoreReadingDocument() {
+            let saved = null;
+            try {
+                saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+            } catch (error) {
+                console.error('Не вдалося прочитати локально збережений файл:', error);
+                throw new Error('Не вдалося відновити збережений файл із цього браузера.');
             }
-        } catch (error) {
-            console.error('Не вдалося відновити збережений файл:', error);
+
+            if (saved?.name) {
+                await renderSavedDocument(saved);
+            }
+
+            if (saved?.kind && saved.kind !== 'image') {
+                return;
+            }
+
+            const latestImage = await LingoUp.getLatestReadingImage();
+            if (!latestImage) {
+                return;
+            }
+
+            if (saved?.storagePath === latestImage.path) {
+                return;
+            }
+
+            const record = {
+                name: latestImage.name,
+                kind: 'image',
+                type: '',
+                storagePath: latestImage.path,
+                ownerId: latestImage.userId,
+                text: '',
+                imageWords: [],
+                ocrProcessed: false
+            };
+            saveStoredDocument(record);
+            await renderSavedDocument(record);
         }
+
+        restoreReadingDocument().catch((error) => {
+            console.error('Не вдалося відновити зображення з сервера:', error);
+            documentStatus.textContent = error.message || 'Не вдалося відновити зображення з сервера.';
+            documentViewer.classList.add('visible');
+        });
     </script>
 </body>
 </html>
